@@ -55,10 +55,14 @@ async function createSite() {
 
   const data = await res.json();
 
-  document.getElementById("result").innerHTML = `
-    <strong>Site Key:</strong><br>${data.siteKey}<br><br>
-    <strong>Embed Code:</strong><br>${data.embed}
-  `;
+ document.getElementById("result").innerHTML = `
+  <strong>Site Key:</strong><br>${data.siteKey}<br><br>
+
+  <strong>Embed Code:</strong>
+  <textarea style="width:100%;height:90px;margin-top:10px;">
+${data.embed}
+  </textarea>
+`;
 }
 </script>
 
