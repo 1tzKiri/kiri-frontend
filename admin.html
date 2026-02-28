@@ -29,6 +29,11 @@
 
 <input type="text" id="name" placeholder="Client name">
 <input type="text" id="domain" placeholder="Client domain (example.com)">
+  <select id="plan">
+  <option value="free">Free</option>
+  <option value="starter">Starter</option>
+  <option value="pro">Pro</option>
+</select>
 
 <button onclick="createSite()">Create Client</button>
 
@@ -46,11 +51,12 @@ async function createSite() {
 
   const name = document.getElementById("name").value;
   const domain = document.getElementById("domain").value;
+  const plan = document.getElementById("plan").value;
 
   const res = await fetch("https://kiri-backend-prod-production.up.railway.app/create-site", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, domain })
+    body: JSON.stringify({ name, domain, plan })
   });
 
   const data = await res.json();
