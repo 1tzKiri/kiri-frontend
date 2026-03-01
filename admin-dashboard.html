@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kiri Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 30px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .stats {
+      margin-bottom: 30px;
+      font-size: 18px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #222;
+      color: white;
+    }
+
+    tr:hover {
+      background: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Kiri Admin Dashboard</h1>
+
+  <div class="stats">
+    <p><strong>Total Clients:</strong> <span id="totalSites"></span></p>
+    <p><strong>Total Monthly Revenue:</strong> $<span id="totalRevenue"></span></p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Plan</th>
+        <th>Usage</th>
+        <th>Limit</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody id="sitesTable"></tbody>
+  </table>
+
+  <script>
+    async function loadDashboard() {
+      const res = await fetch("https://kiri-backend-prod-production.up.railway.app/admin-overview");
+      const data = await res.json();
+
+      document.getElementById("totalSites").textContent = data.totalSites;
+      document.getElementById("totalRevenue").textContent = data.totalMonthlyRevenue;
+
+      const table = document.getElementById("sitesTable");
+      table.innerHTML = "";
+
+      data.sites.forEach(site => {
+        const row = `
+          <tr>
+            <td>${site.id}</td>
+            <td>${site.name}</td>
+            <td>${site.plan_name}</td>
+            <td>${site.monthly_message_count}</td>
+            <td>${site.monthly_limit}</td>
+            <td>$${site.price}</td>
+          </tr>
+        `;
+        table.innerHTML += row;
+      });
+    }
+
+    loadDashboard();
+  </script>
+
+</body>
+</html>
