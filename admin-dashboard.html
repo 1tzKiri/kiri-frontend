@@ -82,7 +82,13 @@
             <td>${site.plan_name}</td>
             <td>${site.monthly_message_count}</td>
             <td>${site.monthly_limit}</td>
-            <td>$${site.price}</td>
+            <td>
+  $${site.price}
+  <br><br>
+  <button onclick="changePlan(${site.id}, 'free')">Free</button>
+  <button onclick="changePlan(${site.id}, 'pro')">Pro</button>
+  <button onclick="deleteSite(${site.id})" style="color:red;">Delete</button>
+</td>
           </tr>
         `;
         table.innerHTML += row;
@@ -90,6 +96,27 @@
     }
 
     loadDashboard();
+async function changePlan(siteId, plan) {
+  await fetch("https://kiri-backend-prod-production.up.railway.app/admin-update-plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ siteId, newPlanName: plan })
+  });
+
+  loadDashboard();
+}
+
+async function deleteSite(siteId) {
+  if (!confirm("Delete this site?")) return;
+
+  await fetch("https://kiri-backend-prod-production.up.railway.app/admin-delete-site", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ siteId })
+  });
+
+  loadDashboard();
+}
   </script>
 
 </body>
