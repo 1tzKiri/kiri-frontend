@@ -65,7 +65,11 @@
 
   <script>
     async function loadDashboard() {
-      const res = await fetch("https://kiri-backend-prod-production.up.railway.app/admin-overview");
+      const res = await fetch("https://kiri-backend-prod-production.up.railway.app/admin-overview", {
+  headers: {
+    "x-admin-secret": "kiri_super_admin_9483729_XYz"
+  }
+});
       const data = await res.json();
 
       document.getElementById("totalSites").textContent = data.totalSites;
@@ -99,7 +103,10 @@
 async function changePlan(siteId, plan) {
   await fetch("https://kiri-backend-prod-production.up.railway.app/admin-update-plan", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+  "Content-Type": "application/json",
+  "x-admin-secret": "kiri_super_admin_9483729_XYz"
+},
     body: JSON.stringify({ siteId, newPlanName: plan })
   });
 
@@ -111,7 +118,10 @@ async function deleteSite(siteId) {
 
   await fetch("https://kiri-backend-prod-production.up.railway.app/admin-delete-site", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+  "Content-Type": "application/json",
+  "x-admin-secret": "kiri_super_admin_9483729_XYz"
+},
     body: JSON.stringify({ siteId })
   });
 
