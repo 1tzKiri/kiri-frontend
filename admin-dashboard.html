@@ -79,25 +79,33 @@
       table.innerHTML = "";
 
       data.sites.forEach(site => {
-        const row = `
-          <tr>
-            <td>${site.id}</td>
-            <td>${site.name}</td>
-            <td>${site.plan_name}</td>
-            <td>${site.monthly_message_count}</td>
-            <td>${site.monthly_limit}</td>
-            <td>
-  $${site.price}
-  <br><br>
-  <button onclick="changePlan(${site.id}, 'free')">Free</button>
-  <button onclick="changePlan(${site.id}, 'pro')">Pro</button>
-  <button onclick="deleteSite(${site.id})" style="color:red;">Delete</button>
-</td>
-          </tr>
-        `;
-        table.innerHTML += row;
-      });
-    }
+  const row = `
+<tr>
+  <td>${site.id}</td>
+  <td>${site.name}</td>
+  <td>${site.plan_name}</td>
+  <td>${site.monthly_message_count}</td>
+  <td>${site.monthly_limit}</td>
+  <td>
+    $${site.price}
+    <br><br>
+    <button onclick="changePlan(${site.id}, 'free')">Free</button>
+    <button onclick="changePlan(${site.id}, 'pro')">Pro</button>
+    <button onclick="deleteSite(${site.id})" style="color:red;">Delete</button>
+    <button onclick="toggleConversations(${site.id})">View</button>
+  </td>
+</tr>
+
+<tr id="conv-${site.id}" style="display:none;">
+  <td colspan="6">
+    <div id="conv-content-${site.id}">
+      Loading...
+    </div>
+  </td>
+</tr>
+`;
+
+table.innerHTML += row;
 
     loadDashboard();
 async function changePlan(siteId, plan) {
@@ -126,6 +134,48 @@ async function deleteSite(siteId) {
   });
 
   loadDashboard();
+}
+
+async function toggleConversations(siteId) {
+  const row = document.getElementById(conv-${siteId});
+  const container = document.getElementById(conv-content-${siteId});
+
+  if (row.style.display === "none") {
+    row.style.display = "table-row";
+
+    container.innerHTML = "Loading...";
+
+    const res = await fetch(
+      https://kiri-backend-prod-production.up.railway.app/admin-conversations/${siteId},
+      {
+        headers: {
+          "x-admin-secret": "YOUR_REAL_SECRET"
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if (!data.messages.length) {
+      container.innerHTML = "No conversations yet.";
+      return;
+    }
+
+    let html = "";
+
+    data.messages.forEach(msg => {
+      html += `
+        <div style="margin-bottom:10px;">
+          <strong>${msg.role}:</strong> ${msg.content}
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+  } else {
+    row.style.display = "none";
+  }
 }
   </script>
 
