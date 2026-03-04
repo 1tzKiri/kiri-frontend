@@ -69,45 +69,40 @@ background:#f1f1f1;
 
 <script>
 
-const ADMIN_SECRET="kiri_super_admin_9483729_XYz";
-const API="https://kiri-backend-prod-production.up.railway.app";
+const ADMIN_SECRET = "kiri_super_admin_9483729_XYz";
+const API = "https://kiri-backend-prod-production.up.railway.app";
 
-async function loadDashboard(){
+async function loadDashboard() {
 
-const res=await fetch(${API}/admin-overview,{
-headers:{
-"x-admin-secret":ADMIN_SECRET
-}
-});
+  const res = await fetch(API + "/admin-overview", {
+    headers: {
+      "x-admin-secret": ADMIN_SECRET
+    }
+  });
 
-const data=await res.json();
+  const data = await res.json();
 
-document.getElementById("totalSites").textContent=data.totalSites;
-document.getElementById("totalRevenue").textContent=data.totalMonthlyRevenue;
+  document.getElementById("totalSites").textContent = data.totalSites;
+  document.getElementById("totalRevenue").textContent = data.totalMonthlyRevenue;
 
-const table=document.getElementById("sitesTable");
-table.innerHTML="";
+  const table = document.getElementById("sitesTable");
+  table.innerHTML = "";
 
-data.sites.forEach(site=>{
+  data.sites.forEach(function(site) {
 
-const row=`
+    const row = `
 <tr>
 <td>${site.id}</td>
 <td>${site.name}</td>
 <td>${site.plan_name}</td>
 <td>${site.monthly_message_count}</td>
 <td>${site.monthly_limit}</td>
-
 <td>
 $${site.price}
 <br><br>
-
-<button onclick="changePlan(${site.id},'free')">Free</button>
-
-<button onclick="changePlan(${site.id},'pro')">Pro</button>
-
+<button onclick="changePlan(${site.id}, 'free')">Free</button>
+<button onclick="changePlan(${site.id}, 'pro')">Pro</button>
 <button onclick="deleteSite(${site.id})" style="color:red;">Delete</button>
-
 <button onclick="toggleConversations(${site.id})">View</button>
 </td>
 </tr>
@@ -121,103 +116,85 @@ Loading...
 </tr>
 `;
 
-table.innerHTML+=row;
+    table.innerHTML += row;
 
-});
-
-}
-
-async function changePlan(siteId,plan){
-
-await fetch(${API}/admin-update-plan,{
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"x-admin-secret":ADMIN_SECRET
-},
-
-body:JSON.stringify({
-siteId:siteId,
-newPlanName:plan
-})
-
-});
-
-loadDashboard();
+  });
 
 }
 
-async function deleteSite(siteId){
+async function changePlan(siteId, plan) {
 
-if(!confirm("Delete this site?")) return;
+  await fetch(API + "/admin-update-plan", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-secret": ADMIN_SECRET
+    },
+    body: JSON.stringify({
+      siteId: siteId,
+      newPlanName: plan
+    })
+  });
 
-await fetch(${API}/admin-delete-site,{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json",
-"x-admin-secret":ADMIN_SECRET
-},
-
-body:JSON.stringify({
-siteId:siteId
-})
-
-});
-
-loadDashboard();
+  loadDashboard();
 
 }
 
-async function toggleConversations(siteId){
+async function deleteSite(siteId) {
 
-const row=document.getElementById(conv-${siteId});
-const container=document.getElementById(conv-content-${siteId});
+  if (!confirm("Delete this site?")) return;
 
-if(row.style.display==="none"){
+  await fetch(API + "/admin-delete-site", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-secret": ADMIN_SECRET
+    },
+    body: JSON.stringify({
+      siteId: siteId
+    })
+  });
 
-row.style.display="table-row";
-
-container.innerHTML="Loading...";
-
-const res=await fetch(${API}/admin-conversations/${siteId},{
-
-headers:{
-"x-admin-secret":ADMIN_SECRET
-}
-
-});
-
-const data=await res.json();
-
-if(!data.messages.length){
-container.innerHTML="No conversations yet.";
-return;
-}
-
-let html="";
-
-data.messages.forEach(msg=>{
-
-html+=`
-<div style="margin-bottom:10px;">
-<strong>${msg.role}:</strong> ${msg.content}
-</div>
-`;
-
-});
-
-container.innerHTML=html;
+  loadDashboard();
 
 }
 
-else{
+async function toggleConversations(siteId) {
 
-row.style.display="none";
+  const row = document.getElementById("conv-" + siteId);
+  const container = document.getElementById("conv-content-" + siteId);
 
-}
+  if (row.style.display === "none") {
+
+    row.style.display = "table-row";
+    container.innerHTML = "Loading...";
+
+    const res = await fetch(API + "/admin-conversations/" + siteId, {
+      headers: {
+        "x-admin-secret": ADMIN_SECRET
+      }
+    });
+
+    const data = await res.json();
+
+    if (!data.messages || data.messages.length === 0) {
+      container.innerHTML = "No conversations yet.";
+      return;
+    }
+
+    let html = "";
+
+    data.messages.forEach(function(msg) {
+      html += "<div style='margin-bottom:10px;'><strong>" + msg.role + ":</strong> " + msg.content + "</div>";
+    });
+
+    container.innerHTML = html;
+
+  } else {
+
+    row.style.display = "none";
+
+  }
 
 }
 
