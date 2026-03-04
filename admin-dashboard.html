@@ -1,183 +1,229 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Kiri Admin Dashboard</title>
-  <style>
-    body {
-      font-family: Arial;
-      padding: 30px;
-      background: #f5f5f5;
-    }
+<title>Kiri Admin Dashboard</title>
 
-    h1 {
-      margin-bottom: 10px;
-    }
+<style>
+body{
+font-family:Arial;
+padding:30px;
+background:#f5f5f5;
+}
 
-    .stats {
-      margin-bottom: 30px;
-      font-size: 18px;
-    }
+h1{
+margin-bottom:10px;
+}
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      background: white;
-    }
+.stats{
+margin-bottom:30px;
+font-size:18px;
+}
 
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
+table{
+border-collapse:collapse;
+width:100%;
+background:white;
+}
 
-    th {
-      background: #222;
-      color: white;
-    }
+th,td{
+border:1px solid #ddd;
+padding:10px;
+text-align:left;
+}
 
-    tr:hover {
-      background: #f1f1f1;
-    }
-  </style>
+th{
+background:#222;
+color:white;
+}
+
+tr:hover{
+background:#f1f1f1;
+}
+</style>
+
 </head>
 <body>
 
-  <h1>Kiri Admin Dashboard</h1>
+<h1>Kiri Admin Dashboard</h1>
 
-  <div class="stats">
-    <p><strong>Total Clients:</strong> <span id="totalSites"></span></p>
-    <p><strong>Total Monthly Revenue:</strong> $<span id="totalRevenue"></span></p>
-  </div>
+<div class="stats">
+<p><strong>Total Clients:</strong> <span id="totalSites"></span></p>
+<p><strong>Total Monthly Revenue:</strong> $<span id="totalRevenue"></span></p>
+</div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Plan</th>
-        <th>Usage</th>
-        <th>Limit</th>
-        <th>Price</th>
-      </tr>
-    </thead>
-    <tbody id="sitesTable"></tbody>
-  </table>
-
-  <script>
-    async function loadDashboard() {
-      const res = await fetch("https://kiri-backend-prod-production.up.railway.app/admin-overview", {
-  headers: {
-    "x-admin-secret": "kiri_super_admin_9483729_XYz"
-  }
-});
-      const data = await res.json();
-
-      document.getElementById("totalSites").textContent = data.totalSites;
-      document.getElementById("totalRevenue").textContent = data.totalMonthlyRevenue;
-
-      const table = document.getElementById("sitesTable");
-      table.innerHTML = "";
-
-      data.sites.forEach(site => {
-const row = `
+<table>
+<thead>
 <tr>
-  <td>${site.id}</td>
-  <td>${site.name}</td>
-  <td>${site.plan_name}</td>
-  <td>${site.monthly_message_count}</td>
-  <td>${site.monthly_limit}</td>
-  <td>
-    $${site.price}
-    <br><br>
-    <button onclick="changePlan(${site.id}, 'free')">Free</button>
-    <button onclick="changePlan(${site.id}, 'pro')">Pro</button>
-    <button onclick="deleteSite(${site.id})" style="color:red;">Delete</button>
-    <button onclick="toggleConversations(${site.id})">View</button>
-  </td>
+<th>ID</th>
+<th>Name</th>
+<th>Plan</th>
+<th>Usage</th>
+<th>Limit</th>
+<th>Price</th>
+</tr>
+</thead>
+
+<tbody id="sitesTable"></tbody>
+
+</table>
+
+<script>
+
+const ADMIN_SECRET="kiri_super_admin_9483729_XYz";
+const API="https://kiri-backend-prod-production.up.railway.app";
+
+async function loadDashboard(){
+
+const res=await fetch(${API}/admin-overview,{
+headers:{
+"x-admin-secret":ADMIN_SECRET
+}
+});
+
+const data=await res.json();
+
+document.getElementById("totalSites").textContent=data.totalSites;
+document.getElementById("totalRevenue").textContent=data.totalMonthlyRevenue;
+
+const table=document.getElementById("sitesTable");
+table.innerHTML="";
+
+data.sites.forEach(site=>{
+
+const row=`
+<tr>
+<td>${site.id}</td>
+<td>${site.name}</td>
+<td>${site.plan_name}</td>
+<td>${site.monthly_message_count}</td>
+<td>${site.monthly_limit}</td>
+
+<td>
+$${site.price}
+<br><br>
+
+<button onclick="changePlan(${site.id},'free')">Free</button>
+
+<button onclick="changePlan(${site.id},'pro')">Pro</button>
+
+<button onclick="deleteSite(${site.id})" style="color:red;">Delete</button>
+
+<button onclick="toggleConversations(${site.id})">View</button>
+</td>
 </tr>
 
 <tr id="conv-${site.id}" style="display:none;">
-  <td colspan="6">
-    <div id="conv-content-${site.id}">
-      Loading...
-    </div>
-  </td>
+<td colspan="6">
+<div id="conv-content-${site.id}">
+Loading...
+</div>
+</td>
 </tr>
 `;
 
-table.innerHTML += row;
+table.innerHTML+=row;
 
-    loadDashboard();
-async function changePlan(siteId, plan) {
-  await fetch("https://kiri-backend-prod-production.up.railway.app/admin-update-plan", {
-    method: "POST",
-    headers: {
-  "Content-Type": "application/json",
-  "x-admin-secret": "kiri_super_admin_9483729_XYz"
+});
+
+}
+
+async function changePlan(siteId,plan){
+
+await fetch(${API}/admin-update-plan,{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"x-admin-secret":ADMIN_SECRET
 },
-    body: JSON.stringify({ siteId, newPlanName: plan })
-  });
 
-  loadDashboard();
+body:JSON.stringify({
+siteId:siteId,
+newPlanName:plan
+})
+
+});
+
+loadDashboard();
+
 }
 
-async function deleteSite(siteId) {
-  if (!confirm("Delete this site?")) return;
+async function deleteSite(siteId){
 
-  await fetch("https://kiri-backend-prod-production.up.railway.app/admin-delete-site", {
-    method: "POST",
-    headers: {
-  "Content-Type": "application/json",
-  "x-admin-secret": "kiri_super_admin_9483729_XYz"
+if(!confirm("Delete this site?")) return;
+
+await fetch(${API}/admin-delete-site,{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"x-admin-secret":ADMIN_SECRET
 },
-    body: JSON.stringify({ siteId })
-  });
 
-  loadDashboard();
+body:JSON.stringify({
+siteId:siteId
+})
+
+});
+
+loadDashboard();
+
 }
 
-async function toggleConversations(siteId) {
-  const row = document.getElementById(conv-${siteId});
-  const container = document.getElementById(conv-content-${siteId});
+async function toggleConversations(siteId){
 
-  if (row.style.display === "none") {
-    row.style.display = "table-row";
+const row=document.getElementById(conv-${siteId});
+const container=document.getElementById(conv-content-${siteId});
 
-    container.innerHTML = "Loading...";
+if(row.style.display==="none"){
 
-    const res = await fetch(
-      https://kiri-backend-prod-production.up.railway.app/admin-conversations/${siteId},
-      {
-        headers: {
-          "x-admin-secret": "YOUR_REAL_SECRET"
-        }
-      }
-    );
+row.style.display="table-row";
 
-    const data = await res.json();
+container.innerHTML="Loading...";
 
-    if (!data.messages.length) {
-      container.innerHTML = "No conversations yet.";
-      return;
-    }
+const res=await fetch(${API}/admin-conversations/${siteId},{
 
-    let html = "";
-
-    data.messages.forEach(msg => {
-      html += `
-        <div style="margin-bottom:10px;">
-          <strong>${msg.role}:</strong> ${msg.content}
-        </div>
-      `;
-    });
-
-    container.innerHTML = html;
-
-  } else {
-    row.style.display = "none";
-  }
+headers:{
+"x-admin-secret":ADMIN_SECRET
 }
-  </script>
+
+});
+
+const data=await res.json();
+
+if(!data.messages.length){
+container.innerHTML="No conversations yet.";
+return;
+}
+
+let html="";
+
+data.messages.forEach(msg=>{
+
+html+=`
+<div style="margin-bottom:10px;">
+<strong>${msg.role}:</strong> ${msg.content}
+</div>
+`;
+
+});
+
+container.innerHTML=html;
+
+}
+
+else{
+
+row.style.display="none";
+
+}
+
+}
+
+loadDashboard();
+
+</script>
 
 </body>
 </html>
