@@ -192,7 +192,7 @@ const messages=document.getElementById("messages");
 const text=input.value.trim();
 if(!text)return;
 
-messages.innerHTML += <div class="msg user">${text}</div>;
+messages.innerHTML += `<div class="msg user">${text}</div>`;
 
 input.value="";
 messages.scrollTop=messages.scrollHeight;
@@ -229,11 +229,11 @@ messages.removeChild(typing);
 
 if(!res.ok){
 
-messages.innerHTML += <div class="msg bot">${data.error || "Limit reached. Try again later."}</div>;
+messages.innerHTML += `<div class="msg bot">${data.error || "Limit reached. Try again later."}</div>`;
 
 }else{
 
-messages.innerHTML += <div class="msg bot">${data.reply}</div>;
+messages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
 
 if(data.reply.includes("human agent") && !document.getElementById("returnAI")){
 
@@ -267,7 +267,7 @@ conversationId
 })
 });
 
-messages.innerHTML += <div class="msg bot">AI assistant reactivated.</div>;
+messages.innerHTML += `<div class="msg bot">AI assistant reactivated.</div>`;
 
 messages.scrollTop=messages.scrollHeight;
 
@@ -289,7 +289,7 @@ messages.scrollTop=messages.scrollHeight;
 
 messages.removeChild(typing);
 
-messages.innerHTML += <div class="msg bot">Server error. Try again later.</div>;
+messages.innerHTML += `<div class="msg bot">Server error. Try again later.</div>`;
 
 console.error(err);
 
