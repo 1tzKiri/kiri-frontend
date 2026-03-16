@@ -284,12 +284,54 @@ async function send() {
 
     messages.removeChild(typing);
 
-    // 🔥 FIX: Proper handling of rate limit or backend errors
-    if (!res.ok) {
-      messages.innerHTML += `<div class="msg bot">${data.error || "Limit reached. Try again later."}</div>`;
-    } else {
-      messages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
-    }
+ if (!res.ok) {
+
+  messages.innerHTML += <div class="msg bot">${data.error || "Limit reached. Try again later."}</div>;
+
+} else {
+
+  const botMsg = document.createElement("div");
+  botMsg.className = "msg bot";
+  botMsg.innerText = data.reply;
+
+  messages.appendChild(botMsg);
+
+  // show button if human takeover message appears
+  if (data.reply.includes("human agent")) {
+
+    const btn = document.createElement("button");
+    btn.innerText = "Return to AI";
+
+    btn.style.marginTop = "8px";
+    btn.style.padding = "6px 12px";
+    btn.style.borderRadius = "8px";
+    btn.style.cursor = "pointer";
+
+    btn.onclick = async () => {
+
+      await fetch(${KIRI_API}/admin/return-to-ai, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          conversationId
+        })
+      });
+
+      const msg = document.createElement("div");
+      msg.className = "msg bot";
+      msg.innerText = "AI assistant reactivated.";
+
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+
+    };
+
+    messages.appendChild(btn);
+  }
+
+}
 
     messages.scrollTop = messages.scrollHeight;
 
