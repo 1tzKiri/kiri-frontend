@@ -235,7 +235,11 @@ messages.innerHTML += `<div class="msg bot">${data.error || "Limit reached. Try 
 
 messages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
 
-if(data.reply.includes("human agent") && !document.getElementById("returnAI")){
+if(
+  (data.reply.toLowerCase().includes("human") ||
+   data.reply.toLowerCase().includes("agent")) &&
+  !document.getElementById("returnAI")
+){
 
 messages.innerHTML += `
 <button id="returnAI" style="
