@@ -206,7 +206,7 @@ messages.scrollTop=messages.scrollHeight;
 
 try{
 
-const res=await fetch(${KIRI_API}/ask,{
+const res=await fetch(`${KIRI_API}/ask`,{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -257,7 +257,7 @@ if(btn){
 
 btn.onclick=async()=>{
 
-await fetch(${KIRI_API}/admin/return-to-ai,{
+await fetch(`${KIRI_API}/admin/return-to-ai`,{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
