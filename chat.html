@@ -284,51 +284,52 @@ async function send() {
 
     messages.removeChild(typing);
 
- if (!res.ok) {
+if (!res.ok) {
 
   messages.innerHTML += <div class="msg bot">${data.error || "Limit reached. Try again later."}</div>;
 
 } else {
 
-  const botMsg = document.createElement("div");
-  botMsg.className = "msg bot";
-  botMsg.innerText = data.reply;
+  messages.innerHTML += <div class="msg bot">${data.reply}</div>;
 
-  messages.appendChild(botMsg);
+  if (data.reply.includes("human agent") && !document.getElementById("returnAI")) {
 
-  // show button if human takeover message appears
-  if (data.reply.includes("human agent")) {
+    messages.innerHTML += `
+      <button id="returnAI" style="
+        margin-top:8px;
+        padding:6px 12px;
+        border-radius:8px;
+        background:#111;
+        border:1px solid rgba(255,255,255,0.1);
+        color:white;
+        cursor:pointer;
+      ">Return to AI</button>
+    `;
 
-    const btn = document.createElement("button");
-    btn.innerText = "Return to AI";
+    setTimeout(() => {
+      const btn = document.getElementById("returnAI");
 
-    btn.style.marginTop = "8px";
-    btn.style.padding = "6px 12px";
-    btn.style.borderRadius = "8px";
-    btn.style.cursor = "pointer";
+      if (btn) {
+        btn.onclick = async () => {
 
-    btn.onclick = async () => {
+          await fetch(\`\${KIRI_API}/admin/return-to-ai\`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              conversationId
+            })
+          });
 
-      await fetch(${KIRI_API}/admin/return-to-ai, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          conversationId
-        })
-      });
+          messages.innerHTML += <div class="msg bot">AI assistant reactivated.</div>;
+          messages.scrollTop = messages.scrollHeight;
+btn.remove();
+        };
+      }
 
-      const msg = document.createElement("div");
-      msg.className = "msg bot";
-      msg.innerText = "AI assistant reactivated.";
+    }, 50);
 
-      messages.appendChild(msg);
-      messages.scrollTop = messages.scrollHeight;
-
-    };
-
-    messages.appendChild(btn);
   }
 
 }
