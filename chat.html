@@ -236,10 +236,12 @@ messages.innerHTML += `<div class="msg bot">${data.error || "Limit reached. Try 
 messages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
 
 if(
-  (data.reply.toLowerCase().includes("human") ||
-   data.reply.toLowerCase().includes("agent")) &&
-  !document.getElementById("returnAI")
+  data.reply.toLowerCase().includes("human") ||
+  data.reply.toLowerCase().includes("agent")
 ){
+
+  const oldBtn = document.getElementById("returnAI");
+  if(oldBtn) oldBtn.remove();
 
 messages.innerHTML += `
 <button id="returnAI" style="
