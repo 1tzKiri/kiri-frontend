@@ -8,199 +8,144 @@
 <style>
 
 :root {
-  --glass: rgba(15, 15, 15, 0.75);
   --border: rgba(255,255,255,0.08);
-  --text: #ffffff;
-  --muted: #ffffff; /* CHANGED: AI text now white */
 }
 
 body {
-  margin: 0;
-  background: transparent;
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  margin:0;
+  background:transparent;
+  font-family:'Inter','Segoe UI',sans-serif;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
-.live-dot {
-  width: 8px;
-  height: 8px;
-  background: #00ff5b;
-  border-radius: 50%;
-  box-shadow: 0 0 6px #00ff5b;
+.live-dot{
+  width:8px;
+  height:8px;
+  background:#00ff5b;
+  border-radius:50%;
+  box-shadow:0 0 6px #00ff5b;
 }
 
-.title {
-  font-weight: 600;
-  color: white;
+.title{
+  font-weight:600;
+  color:white;
 }
 
-/* FLOATING BUTTON */
-#kiri-btn {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 58px;
-  height: 58px;
-  background: #000;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 20px 40px rgba(0,0,0,.7);
-  z-index: 9999;
+#kiri-widget{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  width:360px;
+  height:520px;
+  background:#1a1a1a;
+  border-radius:20px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  display:flex;
+  flex-direction:column;
+  z-index:9999;
 }
 
-/* WIDGET */
-#kiri-widget {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 360px;
-  height: 520px;
-  background: #1a1a1a;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
-  display: flex;
-  flex-direction: column;
-  z-index: 9999;
+#header{
+  background:#000;
+  color:#fff;
+  padding:14px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-family:'Poppins',sans-serif;
+  font-weight:600;
 }
 
-@media (max-width: 480px) {
-  #kiri-widget {
-    width: 92vw;
-    height: 80vh;
-    right: 4vw;
-    bottom: 90px;
-  }
+#close{
+  background:none;
+  border:none;
+  color:#e11d48;
+  font-size:18px;
+  cursor:pointer;
 }
 
-/* HEADER */
-#header {
-  background: #000000;
-  color: #ffffff;
-  padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
-  letter-spacing: 1px;
-}
-#close {
-  background: none;
-  border: none;
-  color: #e11d48; /* nice red */
-  font-size: 18px;
-  cursor: pointer;
-  padding: 0;
-  font-weight: bold;
+#messages{
+  flex:1;
+  padding:16px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  background:#1a1a1a;
 }
 
-#close:hover {
-  opacity: 0.7;
+.msg{
+  max-width:80%;
+  padding:10px 14px;
+  border-radius:14px;
+  font-size:14px;
 }
 
-/* MESSAGES */
-#messages {
-  flex: 1 1 auto;   /* IMPORTANT */
-  min-height: 0;    /* VERY IMPORTANT (fixes flex overflow bugs) */
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: #1a1a1a;
-}
-.msg {
-  max-width: 80%;
-  margin-bottom: 12px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  font-size: 14px;
-  line-height: 1.4;
+.user{
+  align-self:flex-end;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:white;
 }
 
-/* USER MESSAGE */
-.user {
-  align-self: flex-end;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: white;
-  padding: 10px 14px;
-  border-radius: 18px 18px 4px 18px;
-  max-width: 75%;
-  font-size: 14px;
-  line-height: 1.4;
-  word-wrap: break-word;
-}
-/* AI MESSAGE */
-.bot {
-  align-self: flex-start;
-  background: #1f2937;
-  color: #e5e7eb;
-  padding: 10px 14px;
-  border-radius: 18px 18px 18px 4px;
-  max-width: 75%;
-  font-size: 14px;
-  line-height: 1.4;
-  word-wrap: break-word;
-  border: 1px solid rgba(255,255,255,0.05);
+.bot{
+  align-self:flex-start;
+  background:#1f2937;
+  color:#e5e7eb;
+  border:1px solid rgba(255,255,255,0.05);
 }
 
-/* INPUT */
-#inputBar {
-  display: flex;
-  gap: 10px;
-  padding: 14px;
-  border-top: 1px solid var(--border);
-  background: #1a1a1a;
+#inputBar{
+  display:flex;
+  gap:10px;
+  padding:14px;
+  border-top:1px solid var(--border);
 }
 
-#input {
-  flex: 1;
-  background: #111827;        /* darker */
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 10px 14px;
-  color: #ffffff;
-  outline: none;
+#input{
+  flex:1;
+  background:#111827;
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;
+  padding:10px 14px;
+  color:white;
+  outline:none;
 }
 
-button {
-  background: #000;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 0 16px;
-  color: #fff;
-  cursor: pointer;
+button{
+  background:#000;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:0 16px;
+  color:white;
+  cursor:pointer;
 }
 
-/* TYPING */
-.typing span {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 4px;
-  background: #fff; /* typing dots now white */
-  border-radius: 50%;
-  animation: blink 1.4s infinite both;
+.typing span{
+  display:inline-block;
+  width:6px;
+  height:6px;
+  margin-right:4px;
+  background:#fff;
+  border-radius:50%;
+  animation:blink 1.4s infinite both;
 }
+
 .typing span:nth-child(2){animation-delay:.2s}
 .typing span:nth-child(3){animation-delay:.4s}
 
-@keyframes blink {
-  0%{opacity:.2}
-  20%{opacity:1}
-  100%{opacity:.2}
+@keyframes blink{
+0%{opacity:.2}
+20%{opacity:1}
+100%{opacity:.2}
 }
+
 </style>
 </head>
 
@@ -208,143 +153,151 @@ button {
 
 <div id="kiri-widget">
 
-  <div id="header">
-    <div class="header-left">
-      <span class="live-dot"></span>
-      <span class="title">KIRI AI</span>
-    </div>
-    <button id="close">×</button>
-  </div>
+<div id="header">
+<div class="header-left">
+<span class="live-dot"></span>
+<span class="title">KIRI AI</span>
+</div>
+<button id="close">×</button>
+</div>
 
-  <div id="messages">
-    <div class="msg bot">Hello. How can I help you?</div>
-  </div>
+<div id="messages">
+<div class="msg bot">Hello. How can I help you?</div>
+</div>
 
-  <div id="inputBar">
-    <input 
-      id="input" 
-      placeholder="Type your message..." 
-      onkeydown="if(event.key==='Enter') send()"
-    />
-    <button onclick="send()">Send</button>
-  </div>
+<div id="inputBar">
+<input id="input" placeholder="Type your message..." onkeydown="if(event.key==='Enter') send()" />
+<button onclick="send()">Send</button>
+</div>
 
 </div>
 
 <script>
 
 let conversationId = localStorage.getItem("conversationId");
+
 const KIRI_API = "https://kiri-backend-prod-production.up.railway.app";
+
 const SITE_KEY = new URLSearchParams(window.location.search).get("siteKey");
 
 document.getElementById("close").onclick = () => {
-  parent.postMessage("kiri-close", "*");
+parent.postMessage("kiri-close","*");
 };
 
-function toggle() {
-  const w = document.getElementById("kiri-widget");
-  w.style.display = w.style.display === "flex" ? "none" : "flex";
+async function send(){
+
+const input=document.getElementById("input");
+const messages=document.getElementById("messages");
+
+const text=input.value.trim();
+if(!text)return;
+
+messages.innerHTML += <div class="msg user">${text}</div>;
+
+input.value="";
+messages.scrollTop=messages.scrollHeight;
+
+const typing=document.createElement("div");
+typing.className="msg bot";
+typing.innerHTML=`<div class="typing"><span></span><span></span><span></span></div>`;
+messages.appendChild(typing);
+
+messages.scrollTop=messages.scrollHeight;
+
+try{
+
+const res=await fetch(${KIRI_API}/ask,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message:text,
+conversationId,
+site_key:SITE_KEY
+})
+});
+
+const data=await res.json();
+
+if(data.conversationId){
+conversationId=data.conversationId;
+localStorage.setItem("conversationId",conversationId);
 }
 
-async function send() {
-  const input = document.getElementById("input");
-  const messages = document.getElementById("messages");
-  const text = input.value.trim();
-  if (!text) return;
+messages.removeChild(typing);
 
-  messages.innerHTML += `<div class="msg user">${text}</div>`;
-  input.value = "";
-  messages.scrollTop = messages.scrollHeight;
+if(!res.ok){
 
-  const typing = document.createElement("div");
-  typing.className = "msg bot";
-  typing.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
-  messages.appendChild(typing);
-  messages.scrollTop = messages.scrollHeight;
+messages.innerHTML += <div class="msg bot">${data.error || "Limit reached. Try again later."}</div>;
 
-  try {
-    const res = await fetch(`${KIRI_API}/ask`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: text,
-        conversationId,
-        site_key: SITE_KEY
-      })
-    });
+}else{
 
-    const data = await res.json();
+messages.innerHTML += <div class="msg bot">${data.reply}</div>;
 
-    if (data.conversationId) {
-      conversationId = data.conversationId;
-      localStorage.setItem("conversationId", conversationId);
-    }
+if(data.reply.includes("human agent") && !document.getElementById("returnAI")){
 
-    messages.removeChild(typing);
+messages.innerHTML += `
+<button id="returnAI" style="
+margin-top:8px;
+padding:6px 12px;
+border-radius:8px;
+background:#111;
+border:1px solid rgba(255,255,255,0.1);
+color:white;
+cursor:pointer;
+">Return to AI</button>
+`;
 
-if (!res.ok) {
+setTimeout(()=>{
 
-  messages.innerHTML +=  `<div class="msg bot">${data.error || "Limit reached. Try again later."}</div>;
+const btn=document.getElementById("returnAI");
 
-} else {
+if(btn){
 
-  messages.innerHTML +=  `<div class="msg bot">${data.reply}</div>;
+btn.onclick=async()=>{
 
-  if (data.reply.includes("human agent") && !document.getElementById("returnAI")) {
+await fetch(${KIRI_API}/admin/return-to-ai,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+conversationId
+})
+});
 
-    messages.innerHTML += `
-      <button id="returnAI" style="
-        margin-top:8px;
-        padding:6px 12px;
-        border-radius:8px;
-        background:#111;
-        border:1px solid rgba(255,255,255,0.1);
-        color:white;
-        cursor:pointer;
-      ">Return to AI</button>
-    `;
+messages.innerHTML += <div class="msg bot">AI assistant reactivated.</div>;
 
-    setTimeout(() => {
-      const btn = document.getElementById("returnAI");
+messages.scrollTop=messages.scrollHeight;
 
-      if (btn) {
-        btn.onclick = async () => {
-
-          await fetch(\`\${KIRI_API}/admin/return-to-ai\`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              conversationId
-            })
-          });
-
-          messages.innerHTML += `<div class="msg bot">AI assistant reactivated.</div>;
-          messages.scrollTop = messages.scrollHeight;
 btn.remove();
-        };
-      }
 
-    }, 50);
-
-  }
+};
 
 }
 
-    messages.scrollTop = messages.scrollHeight;
+},50);
 
-  } catch (err) {
-    messages.removeChild(typing);
-    messages.innerHTML += `<div class="msg bot">Server error. Try again later.</div>`;
-    console.error(err);
-  }
+}
+
+}
+
+messages.scrollTop=messages.scrollHeight;
+
+}catch(err){
+
+messages.removeChild(typing);
+
+messages.innerHTML += <div class="msg bot">Server error. Try again later.</div>;
+
+console.error(err);
+
+}
+
 }
 
 </script>
 
 </body>
 </html>
-
