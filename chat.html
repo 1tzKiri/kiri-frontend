@@ -302,6 +302,8 @@ console.error(err);
 }
 
 }
+let lastMessageCount = 0;
+
 setInterval(async () => {
   if (!conversationId) return;
 
@@ -311,17 +313,20 @@ setInterval(async () => {
 
     const messages = document.getElementById("messages");
 
-    // clear and re-render messages
-    messages.innerHTML = "";
+    if (data.length === lastMessageCount) return;
 
-    data.forEach(m => {
+    // only add new messages
+    for (let i = lastMessageCount; i < data.length; i++) {
+      const m = data[i];
+
       messages.innerHTML += `
         <div class="msg ${m.role === "user" ? "user" : "bot"}">
           ${m.content}
         </div>
       `;
-    });
+    }
 
+    lastMessageCount = data.length;
     messages.scrollTop = messages.scrollHeight;
 
   } catch (err) {
