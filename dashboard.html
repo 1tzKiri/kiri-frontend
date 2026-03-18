@@ -21,17 +21,17 @@ const API = "https://kiri-backend-prod-production.up.railway.app";
 let currentConversationId = null;
 
 async function loadConversations() {
-  const res = await fetch(${API}/admin/conversations);
+  const res = await fetch(API + "/admin/conversations");
   const data = await res.json();
 
-  const container = document.getElementById("conversations");
-  container.innerHTML = "";
+ const container = document.getElementById("conversations");
+container.innerHTML = "";
 
   data.forEach(conv => {
     const div = document.createElement("div");
-    div.innerText = #${conv.id} | ${conv.domain};
-    
-    div.onclick = () => {
+    div.innerText = "#" + conv.id + " | " + conv.domain;
+
+    div.onclick = function () {
       currentConversationId = conv.id;
       loadMessages(conv.id);
     };
@@ -41,7 +41,7 @@ async function loadConversations() {
 }
 
 async function loadMessages(id) {
-  const res = await fetch(${API}/messages/${id});
+  const res = await fetch(API + "/messages/" + id);
   const data = await res.json();
 
   const chat = document.getElementById("chat");
@@ -49,7 +49,7 @@ async function loadMessages(id) {
 
   data.forEach(msg => {
     const div = document.createElement("div");
-    div.innerText = ${msg.role}: ${msg.content};
+    div.innerText = msg.role + ": " + msg.content;
     chat.appendChild(div);
   });
 }
@@ -62,7 +62,7 @@ async function sendReply() {
     return;
   }
 
-  const res = await fetch(${API}/admin/reply, {
+  await fetch(API + "/admin/reply", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -73,13 +73,7 @@ async function sendReply() {
     })
   });
 
-  if (!res.ok) {
-    alert("Failed to send");
-    return;
-  }
-
   input.value = "";
-
   loadMessages(currentConversationId);
 }
 
