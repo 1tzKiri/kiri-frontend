@@ -41,7 +41,7 @@ container.innerHTML = "";
 }
 
 async function loadMessages(id) {
-  const res = await fetch(API + "/messages/" + id);
+  const res = await fetch(API + "/admin/messages/" + id);
   const data = await res.json();
 
   const chat = document.getElementById("chat");
@@ -58,7 +58,7 @@ async function sendReply() {
   const input = document.getElementById("replyInput");
 
   if (!currentConversationId) {
-    alert("Select conversation first");
+    alert("Click conversation first");
     return;
   }
 
@@ -76,6 +76,7 @@ async function sendReply() {
   input.value = "";
   loadMessages(currentConversationId);
 }
+
 
 loadConversations();
 
