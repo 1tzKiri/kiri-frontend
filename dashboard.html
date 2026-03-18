@@ -1,52 +1,55 @@
-<hr>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kiri Dashboard</title>
+</head>
+<body>
 
 <h2>Conversations</h2>
 <div id="conversations"></div>
 
-<hr>
-
 <h2>Chat</h2>
-<div id="chat"></div>
+<div id="chat" style="margin-bottom:20px;"></div>
 
 <input id="replyInput" placeholder="Reply as human">
 <button onclick="sendReply()">Send</button>
 
 <script>
 
+const API = "https://kiri-backend-prod-production.up.railway.app";
+
 let currentConversationId = null;
 
 async function loadConversations() {
-  const res = await fetch("https://kiri-backend-prod-production.up.railway.app/admin/conversations");
+  const res = await fetch(${API}/admin/conversations);
   const data = await res.json();
 
   const container = document.getElementById("conversations");
   container.innerHTML = "";
 
-  data.forEach(c => {
+  data.forEach(conv => {
     const div = document.createElement("div");
-    div.style.cursor = "pointer";
-    div.style.marginBottom = "10px";
-
-    div.innerText = #${c.id} | ${c.domain} | ${c.human_takeover ? "HUMAN" : "AI"};
-
-    div.onclick = () => loadMessages(c.id);
+    div.innerText = #${conv.id} | ${conv.domain};
+    
+    div.onclick = () => {
+      currentConversationId = conv.id;
+      loadMessages(conv.id);
+    };
 
     container.appendChild(div);
   });
 }
 
 async function loadMessages(id) {
-  currentConversationId = id;
-
-  const res = await fetch(https://kiri-backend-prod-production.up.railway.app/admin/messages/${id});
+  const res = await fetch(${API}/messages/${id});
   const data = await res.json();
 
   const chat = document.getElementById("chat");
   chat.innerHTML = "";
 
-  data.forEach(m => {
+  data.forEach(msg => {
     const div = document.createElement("div");
-    div.innerText = ${m.role}: ${m.content};
+    div.innerText = ${msg.role}: ${msg.content};
     chat.appendChild(div);
   });
 }
@@ -54,7 +57,12 @@ async function loadMessages(id) {
 async function sendReply() {
   const input = document.getElementById("replyInput");
 
-  await fetch("https://kiri-backend-prod-production.up.railway.app/admin/reply", {
+  if (!currentConversationId) {
+    alert("Select conversation first");
+    return;
+  }
+
+  const res = await fetch(${API}/admin/reply, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -65,10 +73,19 @@ async function sendReply() {
     })
   });
 
+  if (!res.ok) {
+    alert("Failed to send");
+    return;
+  }
+
   input.value = "";
+
   loadMessages(currentConversationId);
 }
 
 loadConversations();
 
 </script>
+
+</body>
+</html>
