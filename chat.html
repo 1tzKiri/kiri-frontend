@@ -302,7 +302,32 @@ console.error(err);
 }
 
 }
+setInterval(async () => {
+  if (!conversationId) return;
 
+  try {
+    const res = await fetch(${KIRI_API}/admin/messages/${conversationId});
+    const data = await res.json();
+
+    const messages = document.getElementById("messages");
+
+    // clear and re-render messages
+    messages.innerHTML = "";
+
+    data.forEach(m => {
+      messages.innerHTML += `
+        <div class="msg ${m.role === "user" ? "user" : "bot"}">
+          ${m.content}
+        </div>
+      `;
+    });
+
+    messages.scrollTop = messages.scrollHeight;
+
+  } catch (err) {
+    console.error("Refresh error:", err);
+  }
+}, 2000);
 </script>
 
 </body>
