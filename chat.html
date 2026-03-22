@@ -308,7 +308,7 @@ setInterval(async () => {
   if (!conversationId) return;
 
   try {
-    const res = await fetch(${KIRI_API}/admin/messages/${conversationId});
+    const res = await fetch(`${KIRI_API}/admin/messages/${conversationId}`);
     const data = await res.json();
 
     const messages = document.getElementById("messages");
