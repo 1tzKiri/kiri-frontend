@@ -1,17 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Kiri Dashboard</title>
+</head>
+
+<body>
+
+<h2>Conversations</h2>
+<div id="conversations"></div>
+
+<h2>Chat</h2>
+<div id="chat" style="margin-bottom:20px;"></div>
+
+<input id="replyInput" placeholder="Reply as human">
+<button onclick="sendReply()">Send</button>
+
 <script>
-  
-window.onload = () => {
-  
+
+// PASSWORD
 const password = prompt("Enter admin password");
 
 if (password !== "kiri-admin-123") {
   document.body.innerHTML = "Access denied";
+  throw new Error("Unauthorized");
 }
 
+// API
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let currentConversationId = null;
 
+// LOAD CONVERSATIONS
 async function loadConversations() {
   const res = await fetch(API + "/admin/conversations");
   const data = await res.json();
@@ -35,7 +54,7 @@ async function loadConversations() {
       <span style="color:gray;">Click to open chat</span>
     `;
 
-    div.onclick = function () {
+    div.onclick = () => {
       currentConversationId = conv.id;
       loadMessages(conv.id);
     };
@@ -44,6 +63,7 @@ async function loadConversations() {
   });
 }
 
+// LOAD MESSAGES
 async function loadMessages(id) {
   const res = await fetch(API + "/admin/messages/" + id);
   const data = await res.json();
@@ -58,6 +78,7 @@ async function loadMessages(id) {
   });
 }
 
+// SEND REPLY
 async function sendReply() {
   const input = document.getElementById("replyInput");
 
@@ -81,6 +102,10 @@ async function sendReply() {
   loadMessages(currentConversationId);
 }
 
+// INIT
 loadConversations();
-};
+
 </script>
+
+</body>
+</html>
