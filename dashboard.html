@@ -17,7 +17,7 @@
 
 <script>
 
-// PASSWORD
+// 🔐 PASSWORD
 const password = prompt("Enter admin password");
 
 if (password !== "kiri-admin-123") {
@@ -25,60 +25,86 @@ if (password !== "kiri-admin-123") {
   throw new Error("Unauthorized");
 }
 
-// API
+// 🌐 API
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let currentConversationId = null;
 
-// LOAD CONVERSATIONS
+// 📥 LOAD CONVERSATIONS
 async function loadConversations() {
-  const res = await fetch(API + "/admin/conversations");
-  const data = await res.json();
+  try {
+    const res = await fetch(API + "/admin/conversations");
+    const data = await res.json();
 
-  const container = document.getElementById("conversations");
-  container.innerHTML = "";
+    const container = document.getElementById("conversations");
+    container.innerHTML = "";
 
-  data.forEach((conv, index) => {
+    data.forEach((conv, index) => {
 
-    const div = document.createElement("div");
+      const div = document.createElement("div");
 
-    div.style.padding = "10px";
-    div.style.border = "1px solid #ddd";
-    div.style.borderRadius = "8px";
-    div.style.marginBottom = "10px";
-    div.style.cursor = "pointer";
+      div.style.padding = "10px";
+      div.style.border = "1px solid #ddd";
+      div.style.borderRadius = "8px";
+      div.style.marginBottom = "10px";
+      div.style.cursor = "pointer";
 
-    div.innerHTML = `
-      <strong>Customer ${index + 1}</strong><br>
-      <small>${conv.domain}</small><br>
-      <span style="color:gray;">Click to open chat</span>
-    `;
+      // highlight active
+      if (conv.id === currentConversationId) {
+        div.style.background = "#f0f0f0";
+      }
 
-    div.onclick = () => {
-      currentConversationId = conv.id;
-      loadMessages(conv.id);
-    };
+      div.innerHTML = `
+        <strong>Customer ${index + 1}</strong><br>
+        <small>${conv.domain}</small><br>
+        <span style="color:gray;">Click to open chat</span>
+      `;
 
-    container.appendChild(div);
-  });
+      div.onclick = () => {
+        currentConversationId = conv.id;
+        loadMessages(conv.id);
+        loadConversations(); // refresh highlight
+      };
+
+      container.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("Conversations error:", err);
+  }
 }
 
-// LOAD MESSAGES
+// 💬 LOAD MESSAGES
 async function loadMessages(id) {
-  const res = await fetch(API + "/admin/messages/" + id);
-  const data = await res.json();
+  try {
+    const res = await fetch(API + "/admin/messages/" + id);
+    const data = await res.json();
 
-  const chat = document.getElementById("chat");
-  chat.innerHTML = "";
+    const chat = document.getElementById("chat");
+    chat.innerHTML = "";
 
-  data.forEach(msg => {
-    const div = document.createElement("div");
-    div.innerText = msg.role + ": " + msg.content;
-    chat.appendChild(div);
-  });
+    data.forEach(msg => {
+      const div = document.createElement("div");
+
+      div.style.marginBottom = "6px";
+
+      if (msg.role === "user") {
+        div.style.color = "blue";
+      } else if (msg.role === "human") {
+        div.style.color = "green";
+      }
+
+      div.innerText = msg.role + ": " + msg.content;
+
+      chat.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("Messages error:", err);
+  }
 }
 
-// SEND REPLY
+// 📤 SEND REPLY
 async function sendReply() {
   const input = document.getElementById("replyInput");
 
@@ -87,6 +113,9 @@ async function sendReply() {
     return;
   }
 
+  const text = input.value.trim();
+  if (!text) return;
+
   await fetch(API + "/admin/reply", {
     method: "POST",
     headers: {
@@ -94,7 +123,7 @@ async function sendReply() {
     },
     body: JSON.stringify({
       conversationId: currentConversationId,
-      message: input.value
+      message: text
     })
   });
 
@@ -102,7 +131,19 @@ async function sendReply() {
   loadMessages(currentConversationId);
 }
 
-// INIT
+// 🔁 AUTO REFRESH CHAT
+setInterval(() => {
+  if (currentConversationId) {
+    loadMessages(currentConversationId);
+  }
+}, 2000);
+
+// 🔁 AUTO REFRESH CONVERSATIONS
+setInterval(() => {
+  loadConversations();
+}, 5000);
+
+// 🚀 INIT
 loadConversations();
 
 </script>
