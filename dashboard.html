@@ -4,86 +4,19 @@
   <title>Kiri Dashboard</title>
 
   <style>
-    body {
-      margin:0;
-      font-family: Arial;
-      display:flex;
-      height:100vh;
-    }
-
-    #sidebar {
-      width:300px;
-      border-right:1px solid #ddd;
-      padding:15px;
-      overflow-y:auto;
-    }
-
-    #chatContainer {
-      flex:1;
-      display:flex;
-      flex-direction:column;
-    }
-
-    #chat {
-      flex:1;
-      padding:15px;
-      overflow-y:auto;
-      background:#f9f9f9;
-    }
-
-    .bubble {
-      max-width:60%;
-      padding:10px;
-      margin-bottom:10px;
-      border-radius:10px;
-    }
-
-    .user {
-      background:#e3f2fd;
-      align-self:flex-start;
-    }
-
-    .human {
-      background:#d1ffd6;
-      align-self:flex-end;
-    }
-
-    #inputBar {
-      display:flex;
-      padding:10px;
-      border-top:1px solid #ddd;
-    }
-
-    #replyInput {
-      flex:1;
-      padding:10px;
-    }
-
-    button {
-      padding:10px;
-    }
-
-    .conversation {
-      padding:10px;
-      border-bottom:1px solid #eee;
-      cursor:pointer;
-      position:relative;
-    }
-
-    .active {
-      background:#f0f0f0;
-    }
-
-    .badge {
-      position:absolute;
-      right:10px;
-      top:10px;
-      background:red;
-      color:white;
-      font-size:12px;
-      padding:2px 6px;
-      border-radius:10px;
-    }
+    body { margin:0; font-family: Arial; display:flex; height:100vh; }
+    #sidebar { width:300px; border-right:1px solid #ddd; padding:15px; overflow-y:auto; }
+    #chatContainer { flex:1; display:flex; flex-direction:column; }
+    #chat { flex:1; padding:15px; overflow-y:auto; background:#f9f9f9; display:flex; flex-direction:column; }
+    .bubble { max-width:60%; padding:10px; margin-bottom:10px; border-radius:10px; }
+    .user { background:#e3f2fd; align-self:flex-start; }
+    .human { background:#d1ffd6; align-self:flex-end; }
+    #inputBar { display:flex; padding:10px; border-top:1px solid #ddd; }
+    #replyInput { flex:1; padding:10px; }
+    button { padding:10px; }
+    .conversation { padding:10px; border-bottom:1px solid #eee; cursor:pointer; }
+    .active { background:#f0f0f0; }
+    .badge { float:right; background:red; color:white; font-size:12px; padding:2px 6px; border-radius:10px; }
   </style>
 
 </head>
@@ -96,14 +29,12 @@
 </div>
 
 <div id="chatContainer">
-
   <div id="chat"></div>
 
   <div id="inputBar">
     <input id="replyInput" placeholder="Reply as human">
     <button onclick="sendReply()">Send</button>
   </div>
-
 </div>
 
 <script>
@@ -118,45 +49,53 @@ if (password !== "kiri-admin-123") {
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let currentConversationId = null;
-let lastMessageCount = 0;
+let lastCounts = {};
 let unread = {};
 
-// SOUND
-const notificationSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
+const sound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 
 // LOAD CONVERSATIONS
 async function loadConversations() {
-  const res = await fetch(API + "/admin/conversations");
-  const data = await res.json();
+  try {
+    const res = await fetch(API + "/admin/conversations");
+    const data = await res.json();
 
-  const container = document.getElementById("conversations");
-  container.innerHTML = "";
+    const container = document.getElementById("conversations");
+    container.innerHTML = "";
 
-  data.forEach((conv, index) => {
+    data.forEach((conv, index) => {
 
-    const div = document.createElement("div");
-    div.className = "conversation";
+      const div = document.createElement("div");
+      div.className = "conversation";
 
-    if (conv.id === currentConversationId) {
-      div.classList.add("active");
-    }
+      if (conv.id === currentConversationId) {
+        div.classList.add("active");
+      }
 
-    div.innerHTML = `
-      <strong>Customer ${index + 1}</strong><br>
-      <small>${conv.domain}</small>
-      ${unread[conv.id] ? <span class="badge">${unread[conv.id]}</span> : ""}
-    `;
+      let badge = "";
+      if (unread[conv.id] > 0) {
+        badge = `<span class="badge">${unread[conv.id]}</span>`;
+      }
 
-    div.onclick = () => {
-      currentConversationId = conv.id;
-      unread[conv.id] = 0;
-      lastMessageCount = 0;
-      loadMessages(conv.id);
-      loadConversations();
-    };
+      div.innerHTML = `
+        <strong>Customer ${index + 1}</strong><br>
+        <small>${conv.domain}</small>
+        ${badge}
+      `;
 
-    container.appendChild(div);
-  });
+      div.onclick = () => {
+        currentConversationId = conv.id;
+        unread[conv.id] = 0;
+        loadMessages(conv.id);
+        loadConversations();
+      };
+
+      container.appendChild(div);
+    });
+
+  } catch (e) {
+    console.error("conv error", e);
+  }
 }
 
 // LOAD MESSAGES
@@ -167,16 +106,14 @@ async function loadMessages(id) {
   const chat = document.getElementById("chat");
   chat.innerHTML = "";
 
-  data.forEach(msg => {
+  data.forEach(m => {
     const div = document.createElement("div");
-
-    div.className = "bubble " + (msg.role === "user" ? "user" : "human");
-    div.innerText = msg.content;
-
+    div.className = "bubble " + (m.role === "user" ? "user" : "human");
+    div.innerText = m.content;
     chat.appendChild(div);
   });
 
-  lastMessageCount = data.length;
+  lastCounts[id] = data.length;
   chat.scrollTop = chat.scrollHeight;
 }
 
@@ -201,24 +138,31 @@ async function sendReply() {
 
 // LIVE SYSTEM
 setInterval(async () => {
+
   const res = await fetch(API + "/admin/conversations");
   const convs = await res.json();
 
-  for (let conv of convs) {
+  for (let c of convs) {
 
-    const res2 = await fetch(API + "/admin/messages/" + conv.id);
+    const res2 = await fetch(API + "/admin/messages/" + c.id);
     const msgs = await res2.json();
 
-    if (msgs.length > (unread[conv.id] || 0)) {
+    if (!lastCounts[c.id]) {
+      lastCounts[c.id] = msgs.length;
+    }
 
-      if (conv.id !== currentConversationId) {
-        unread[conv.id] = (msgs.length - lastMessageCount);
-        notificationSound.play();
+    if (msgs.length > lastCounts[c.id]) {
+
+      if (c.id !== currentConversationId) {
+        unread[c.id] = (unread[c.id] || 0) + (msgs.length - lastCounts[c.id]);
+        sound.play();
       }
 
-      if (conv.id === currentConversationId) {
-        loadMessages(conv.id);
+      if (c.id === currentConversationId) {
+        loadMessages(c.id);
       }
+
+      lastCounts[c.id] = msgs.length;
     }
   }
 
