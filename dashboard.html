@@ -29,6 +29,10 @@ if (password !== "kiri-admin-123") {
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let currentConversationId = null;
+let lastMessageCount = 0;
+
+// 🔔 SOUND
+const notificationSound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 
 // 📥 LOAD CONVERSATIONS
 async function loadConversations() {
@@ -49,7 +53,6 @@ async function loadConversations() {
       div.style.marginBottom = "10px";
       div.style.cursor = "pointer";
 
-      // highlight active
       if (conv.id === currentConversationId) {
         div.style.background = "#f0f0f0";
       }
@@ -62,8 +65,9 @@ async function loadConversations() {
 
       div.onclick = () => {
         currentConversationId = conv.id;
+        lastMessageCount = 0; // reset tracking
         loadMessages(conv.id);
-        loadConversations(); // refresh highlight
+        loadConversations();
       };
 
       container.appendChild(div);
@@ -88,16 +92,15 @@ async function loadMessages(id) {
 
       div.style.marginBottom = "6px";
 
-      if (msg.role === "user") {
-        div.style.color = "blue";
-      } else if (msg.role === "human") {
-        div.style.color = "green";
-      }
+      if (msg.role === "user") div.style.color = "blue";
+      if (msg.role === "human") div.style.color = "green";
 
       div.innerText = msg.role + ": " + msg.content;
 
       chat.appendChild(div);
     });
+
+    lastMessageCount = data.length;
 
   } catch (err) {
     console.error("Messages error:", err);
@@ -131,14 +134,51 @@ async function sendReply() {
   loadMessages(currentConversationId);
 }
 
-// 🔁 AUTO REFRESH CHAT
-setInterval(() => {
-  if (currentConversationId) {
-    loadMessages(currentConversationId);
+// 🔁 LIVE CHAT + NOTIFICATIONS
+setInterval(async () => {
+  if (!currentConversationId) return;
+
+  try {
+    const res = await fetch(API + "/admin/messages/" + currentConversationId);
+    const data = await res.json();
+
+    const chat = document.getElementById("chat");
+
+    if (data.length > lastMessageCount) {
+
+      const newMessages = data.slice(lastMessageCount);
+
+      newMessages.forEach(msg => {
+        const div = document.createElement("div");
+
+        div.style.marginBottom = "6px";
+
+        if (msg.role === "user") {
+          div.style.color = "blue";
+          notificationSound.play();
+          alert("New message from user");
+        }
+
+        if (msg.role === "human") {
+          div.style.color = "green";
+        }
+
+        div.innerText = msg.role + ": " + msg.content;
+
+        chat.appendChild(div);
+      });
+
+      lastMessageCount = data.length;
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+  } catch (err) {
+    console.error("Refresh error:", err);
   }
+
 }, 2000);
 
-// 🔁 AUTO REFRESH CONVERSATIONS
+// 🔁 REFRESH CONVERSATIONS
 setInterval(() => {
   loadConversations();
 }, 5000);
