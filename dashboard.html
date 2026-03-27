@@ -39,11 +39,13 @@
 
 <script>
 
-// PASSWORD
-const password = prompt("Enter admin password");
-if (password !== "kiri-admin-123") {
-  document.body.innerHTML = "Access denied";
-  throw new Error("Unauthorized");
+const ROLE = localStorage.getItem("role");
+
+if (!ROLE) {
+  window.location.href = "/login.html";
+}
+if (ROLE !== "admin") {
+  alert("You are not admin");
 }
 
 const API = "https://kiri-backend-prod-production.up.railway.app";
