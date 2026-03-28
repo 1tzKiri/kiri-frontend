@@ -60,7 +60,8 @@ const isAdmin = user.role === "admin";
 
 // ✅ HIDE ADMIN PANEL IF NOT ADMIN
 if (!isAdmin) {
-  document.getElementById("adminPanel").style.display = "none";
+  const panel = document.getElementById("adminPanel");
+  if (panel) panel.style.display = "none";
 }
 
 const API = "https://kiri-backend-prod-production.up.railway.app";
@@ -71,7 +72,7 @@ let unread = {};
 
 const sound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 
-// 🔥 URL SWITCH
+// 🔥 GET URL
 function getConversationsURL() {
   return isAdmin
     ? API + "/admin/conversations"
@@ -98,7 +99,7 @@ async function loadConversations() {
 
       let badge = "";
       if (unread[conv.id] > 0) {
-        badge =  `<span class="badge">${unread[conv.id]}</span>`;
+        badge = <span class="badge">${unread[conv.id]}</span>;
       }
 
       div.innerHTML = `
@@ -118,110 +119,131 @@ async function loadConversations() {
     });
 
   } catch (e) {
-    console.error("conv error", e);
+    console.error("loadConversations error:", e);
   }
 }
 
 // LOAD MESSAGES
 async function loadMessages(id) {
-  const endpoint = isAdmin
-    ? API + "/admin/messages/" + id
-    : API + "/messages/" + id;
+  try {
+    const endpoint = isAdmin
+      ? API + "/admin/messages/" + id
+      : API + "/messages/" + id;
 
-  const res = await fetch(endpoint);
-  const data = await res.json();
+    const res = await fetch(endpoint);
+    const data = await res.json();
 
-  const chat = document.getElementById("chat");
-  chat.innerHTML = "";
+    const chat = document.getElementById("chat");
+    chat.innerHTML = "";
 
-  data.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "bubble " + (m.role === "user" ? "user" : "human");
-    div.innerText = m.content;
-    chat.appendChild(div);
-  });
+    data.forEach(m => {
+      const div = document.createElement("div");
+      div.className = "bubble " + (m.role === "user" ? "user" : "human");
+      div.innerText = m.content;
+      chat.appendChild(div);
+    });
 
-  lastCounts[id] = data.length;
-  chat.scrollTop = chat.scrollHeight;
+    lastCounts[id] = data.length;
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch (e) {
+    console.error("loadMessages error:", e);
+  }
 }
 
 // SEND MESSAGE
 async function sendReply() {
   const input = document.getElementById("replyInput");
 
-  if (!currentConversationId) return;
+  if (!currentConversationId || !input.value) return;
 
-  const endpoint = isAdmin
-    ? API + "/admin/reply"
-    : API + "/reply";
+  try {
+    const endpoint = isAdmin
+      ? API + "/admin/reply"
+      : API + "/reply";
 
-  await fetch(endpoint, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      conversationId: currentConversationId,
-      message: input.value
-    })
-  });
+    await fetch(endpoint, {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({
+        conversationId: currentConversationId,
+        message: input.value
+      })
+    });
 
-  input.value = "";
-  loadMessages(currentConversationId);
+    input.value = "";
+    loadMessages(currentConversationId);
+
+  } catch (e) {
+    console.error("sendReply error:", e);
+  }
 }
 
-// 🔥 CREATE USER (ADMIN)
+// CREATE USER (ADMIN ONLY)
 async function createUser() {
   const email = document.getElementById("newEmail").value;
   const password = document.getElementById("newPassword").value;
 
-  const res = await fetch(API + "/admin/create-user", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password })
-  });
+  if (!email || !password) return alert("Fill fields");
 
-  const data = await res.json();
+  try {
+    const res = await fetch(API + "/admin/create-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, password })
+    });
 
-  document.getElementById("result").innerText =
-    "Client created | site_key: " + data.site_key;
+    const data = await res.json();
+
+    document.getElementById("result").innerText =
+      "Client created | site_key: " + data.site_key;
+
+  } catch (e) {
+    console.error("createUser error:", e);
+  }
 }
 
-// LIVE SYSTEM
+// LIVE UPDATES
 setInterval(async () => {
+  try {
+    const res = await fetch(getConversationsURL());
+    const convs = await res.json();
 
-  const res = await fetch(getConversationsURL());
-  const convs = await res.json();
+    for (let c of convs) {
 
-  for (let c of convs) {
+      const endpoint = isAdmin
+        ? API + "/admin/messages/" + c.id
+        : API + "/messages/" + c.id;
 
-    const endpoint = isAdmin
-      ? API + "/admin/messages/" + c.id
-      : API + "/messages/" + c.id;
+      const res2 = await fetch(endpoint);
+      const msgs = await res2.json();
 
-    const res2 = await fetch(endpoint);
-    const msgs = await res2.json();
-
-    if (!lastCounts[c.id]) {
-      lastCounts[c.id] = msgs.length;
-    }
-
-    if (msgs.length > lastCounts[c.id]) {
-
-      if (c.id !== currentConversationId) {
-        unread[c.id] = (unread[c.id] || 0) + (msgs.length - lastCounts[c.id]);
-        sound.play();
+      if (!lastCounts[c.id]) {
+        lastCounts[c.id] = msgs.length;
       }
 
-      if (c.id === currentConversationId) {
-        loadMessages(c.id);
-      }
+      if (msgs.length > lastCounts[c.id]) {
 
-      lastCounts[c.id] = msgs.length;
+        if (c.id !== currentConversationId) {
+          unread[c.id] = (unread[c.id] || 0) + (msgs.length - lastCounts[c.id]);
+          sound.play();
+        }
+
+        if (c.id === currentConversationId) {
+          loadMessages(c.id);
+        }
+
+        lastCounts[c.id] = msgs.length;
+      }
     }
+
+    loadConversations();
+
+  } catch (e) {
+    console.error("live update error:", e);
   }
-
-  loadConversations();
 
 }, 3000);
 
@@ -229,6 +251,5 @@ setInterval(async () => {
 loadConversations();
 
 </script>
-
 </body>
 </html>
