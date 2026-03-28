@@ -13,7 +13,7 @@
     .human { background:#d1ffd6; align-self:flex-end; }
     #inputBar { display:flex; padding:10px; border-top:1px solid #ddd; }
     #replyInput { flex:1; padding:10px; }
-    button { padding:10px; }
+    button { padding:10px; margin-top:5px; }
     .conversation { padding:10px; border-bottom:1px solid #eee; cursor:pointer; }
     .active { background:#f0f0f0; }
     .badge { float:right; background:red; color:white; font-size:12px; padding:2px 6px; border-radius:10px; }
@@ -23,8 +23,19 @@
 <body>
 
 <div id="sidebar">
+
+  <!-- 🔥 ADMIN PANEL -->
+  <div id="adminPanel" style="padding:10px; border-bottom:1px solid #ddd;">
+    <h3>Create Client</h3>
+    <input id="newEmail" placeholder="email"><br>
+    <input id="newPassword" placeholder="password"><br>
+    <button onclick="createUser()">Create</button>
+    <div id="result"></div>
+  </div>
+
   <h3>Conversations</h3>
   <div id="conversations"></div>
+
 </div>
 
 <div id="chatContainer">
@@ -38,15 +49,19 @@
 
 <script>
 
-// ✅ GET USER FROM LOGIN
+// ✅ GET USER
 const user = JSON.parse(localStorage.getItem("user"));
 
 if (!user) {
   window.location.href = "/login.html";
 }
 
-// OPTIONAL: block non-admin features later
 const isAdmin = user.role === "admin";
+
+// ✅ HIDE ADMIN PANEL IF NOT ADMIN
+if (!isAdmin) {
+  document.getElementById("adminPanel").style.display = "none";
+}
 
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
@@ -56,13 +71,11 @@ let unread = {};
 
 const sound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 
-// 🔥 GET CORRECT URL (ADMIN OR USER)
+// 🔥 URL SWITCH
 function getConversationsURL() {
-  if (isAdmin) {
-    return API + "/admin/conversations";
-  } else {
-    return API + "/conversations?site_key=" + user.site_key;
-  }
+  return isAdmin
+    ? API + "/admin/conversations"
+    : API + "/conversations?site_key=" + user.site_key;
 }
 
 // LOAD CONVERSATIONS
@@ -153,6 +166,25 @@ async function sendReply() {
 
   input.value = "";
   loadMessages(currentConversationId);
+}
+
+// 🔥 CREATE USER (ADMIN)
+async function createUser() {
+  const email = document.getElementById("newEmail").value;
+  const password = document.getElementById("newPassword").value;
+
+  const res = await fetch(API + "/admin/create-user", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("result").innerText =
+    "Client created | site_key: " + data.site_key;
 }
 
 // LIVE SYSTEM
