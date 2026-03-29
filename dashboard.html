@@ -49,21 +49,30 @@
 
 <script>
 
-// ✅ GET USER
-const user = JSON.parse(localStorage.getItem("user"));
+// ================= USER =================
+let user = null;
 
-if (!user) {
+try {
+  user = JSON.parse(localStorage.getItem("user"));
+} catch (e) {
+  console.error("User parse error");
+}
+
+console.log("USER:", user);
+
+if (!user || !user.role) {
   window.location.href = "/login.html";
 }
 
 const isAdmin = user.role === "admin";
 
-// ✅ HIDE ADMIN PANEL IF NOT ADMIN
+// hide admin panel if not admin
 if (!isAdmin) {
   const panel = document.getElementById("adminPanel");
   if (panel) panel.style.display = "none";
 }
 
+// ================= CONFIG =================
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let currentConversationId = null;
@@ -72,14 +81,14 @@ let unread = {};
 
 const sound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 
-// 🔥 GET URL
+// ================= HELPERS =================
 function getConversationsURL() {
   return isAdmin
     ? API + "/admin/conversations"
     : API + "/conversations?site_key=" + user.site_key;
 }
 
-// LOAD CONVERSATIONS
+// ================= LOAD CONVERSATIONS =================
 async function loadConversations() {
   try {
     const res = await fetch(getConversationsURL());
@@ -99,7 +108,7 @@ async function loadConversations() {
 
       let badge = "";
       if (unread[conv.id] > 0) {
-        badge = <span class="badge">${unread[conv.id]}</span>;
+        badge = `<span class="badge">${unread[conv.id]}</span>`;
       }
 
       div.innerHTML = `
@@ -123,7 +132,7 @@ async function loadConversations() {
   }
 }
 
-// LOAD MESSAGES
+// ================= LOAD MESSAGES =================
 async function loadMessages(id) {
   try {
     const endpoint = isAdmin
@@ -151,7 +160,7 @@ async function loadMessages(id) {
   }
 }
 
-// SEND MESSAGE
+// ================= SEND MESSAGE =================
 async function sendReply() {
   const input = document.getElementById("replyInput");
 
@@ -179,7 +188,7 @@ async function sendReply() {
   }
 }
 
-// CREATE USER (ADMIN ONLY)
+// ================= CREATE USER =================
 async function createUser() {
   const email = document.getElementById("newEmail").value;
   const password = document.getElementById("newPassword").value;
@@ -205,7 +214,7 @@ async function createUser() {
   }
 }
 
-// LIVE UPDATES
+// ================= LIVE UPDATES =================
 setInterval(async () => {
   try {
     const res = await fetch(getConversationsURL());
@@ -247,7 +256,7 @@ setInterval(async () => {
 
 }, 3000);
 
-// INIT
+// ================= INIT =================
 loadConversations();
 
 </script>
