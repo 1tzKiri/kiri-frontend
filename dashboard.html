@@ -57,14 +57,7 @@ try {
 } catch (e) {
   console.log("parse error");
 }
-
-// 🔥 ONLY redirect if you're NOT already on login
-if (!user || !user.role) {
-  if (!window.location.pathname.includes("login")) {
-    console.log("redirecting to login...");
-    window.location.href = "/login.html";
-  }
-}
+console.log("USER:", user);
 const isAdmin = user.role === "admin";
 
 // hide admin panel if not admin
