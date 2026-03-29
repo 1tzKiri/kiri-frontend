@@ -55,15 +55,16 @@ let user = null;
 try {
   user = JSON.parse(localStorage.getItem("user"));
 } catch (e) {
-  console.error("User parse error");
+  console.log("parse error");
 }
 
-console.log("USER:", user);
-
+// 🔥 ONLY redirect if you're NOT already on login
 if (!user || !user.role) {
-  window.location.href = "/login.html";
+  if (!window.location.pathname.includes("login")) {
+    console.log("redirecting to login...");
+    window.location.href = "/login.html";
+  }
 }
-
 const isAdmin = user.role === "admin";
 
 // hide admin panel if not admin
