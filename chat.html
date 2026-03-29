@@ -178,7 +178,11 @@ let conversationId = localStorage.getItem("conversationId");
 
 const KIRI_API = "https://kiri-backend-prod-production.up.railway.app";
 
-const SITE_KEY = new URLSearchParams(window.location.search).get("siteKey");
+const SITE_KEY =
+  new URLSearchParams(window.location.search).get("site_key") ||
+  new URLSearchParams(window.location.search).get("siteKey");
+
+console.log("SITE_KEY:", SITE_KEY);
 
 document.getElementById("close").onclick = () => {
 parent.postMessage("kiri-close","*");
