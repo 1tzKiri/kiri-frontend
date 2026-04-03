@@ -47,149 +47,11 @@
   </div>
 </div>
 
-  <script>
+ <script>
 console.log("SCRIPT WORKING");
-// ================= USER =================
-let user = null;
 
-try {
-  user = JSON.parse(localStorage.getItem("user"));
-} catch (e) {
-  console.log("parse error");
-}
-
-console.log("USER:", user);
-
-// default role if not logged
-const isAdmin = user && user.role === "admin";
-
-// hide admin panel if not admin
-if (!isAdmin) {
-  const panel = document.getElementById("adminPanel");
-  if (panel) panel.style.display = "block"; // keep visible for signup
-}
-
-// ================= CONFIG =================
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
-let currentConversationId = null;
-let lastCounts = {};
-let unread = {};
-
-const sound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
-
-// ================= HELPERS =================
-function getConversationsURL() {
-  if (!user) return null;
-
-  return isAdmin
-    ? API + "/admin/conversations"
-    : API + "/conversations?site_key=" + user.site_key;
-}
-
-// ================= LOAD CONVERSATIONS =================
-async function loadConversations() {
-  if (!user) return;
-
-  try {
-    const res = await fetch(getConversationsURL());
-    const data = await res.json();
-
-    const container = document.getElementById("conversations");
-    container.innerHTML = "";
-
-    data.forEach((conv, index) => {
-
-      const div = document.createElement("div");
-      div.className = "conversation";
-
-      if (conv.id === currentConversationId) {
-        div.classList.add("active");
-      }
-
-      let badge = "";
-      if (unread[conv.id] > 0) {
-        badge = <span class="badge">${unread[conv.id]}</span>;
-      }
-
-      div.innerHTML = `
-        <strong>Customer ${index + 1}</strong><br>
-        <small>${conv.domain}</small>
-        ${badge}
-      `;
-
-      div.onclick = () => {
-        currentConversationId = conv.id;
-        unread[conv.id] = 0;
-        loadMessages(conv.id);
-        loadConversations();
-      };
-
-      container.appendChild(div);
-    });
-
-  } catch (e) {
-    console.error("loadConversations error:", e);
-  }
-}
-
-// ================= LOAD MESSAGES =================
-async function loadMessages(id) {
-  try {
-    const endpoint = isAdmin
-      ? API + "/admin/messages/" + id
-      : API + "/messages/" + id;
-
-    const res = await fetch(endpoint);
-    const data = await res.json();
-
-    const chat = document.getElementById("chat");
-    chat.innerHTML = "";
-
-    data.forEach(m => {
-      const div = document.createElement("div");
-      div.className = "bubble " + (m.role === "user" ? "user" : "human");
-      div.innerText = m.content;
-      chat.appendChild(div);
-    });
-
-    lastCounts[id] = data.length;
-    chat.scrollTop = chat.scrollHeight;
-
-  } catch (e) {
-    console.error("loadMessages error:", e);
-  }
-}
-
-// ================= SEND MESSAGE =================
-async function sendReply() {
-  const input = document.getElementById("replyInput");
-
-  if (!currentConversationId || !input.value) return;
-
-  try {
-    const endpoint = isAdmin
-      ? API + "/admin/reply"
-      : API + "/reply";
-
-    await fetch(endpoint, {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        conversationId: currentConversationId,
-        message: input.value
-      })
-    });
-
-    input.value = "";
-    loadMessages(currentConversationId);
-
-  } catch (e) {
-    console.error("sendReply error:", e);
-  }
-}
-
-// ================= CREATE ACCOUNT (UPDATED) =================
 async function createUser() {
   const email = document.getElementById("newEmail").value;
   const password = document.getElementById("newPassword").value;
@@ -207,84 +69,13 @@ async function createUser() {
 
     const data = await res.json();
 
-    if (data.site_key) {
-
-      // SAVE USER (VERY IMPORTANT)
-      const userData = {
-        email,
-        role: "user",
-        site_key: data.site_key
-      };
-
-      localStorage.setItem("user", JSON.stringify(userData));
-      user = userData;
-
-      document.getElementById("result").innerText =
-        "✅ Account created | site_key: " + data.site_key;
-
-      // load conversations after signup
-      loadConversations();
-
-    } else {
-      document.getElementById("result").innerText =
-        "❌ Error: " + data.error;
-    }
+    document.getElementById("result").innerText =
+      "Created | site_key: " + data.site_key;
 
   } catch (e) {
-    console.error("createUser error:", e);
+    console.error(e);
   }
 }
-
-// ================= LIVE UPDATES =================
-setInterval(async () => {
-  if (!user) return;
-
-  try {
-    const res = await fetch(getConversationsURL());
-    const convs = await res.json();
-
-    for (let c of convs) {
-
-      const endpoint = isAdmin
-        ? API + "/admin/messages/" + c.id
-        : API + "/messages/" + c.id;
-
-      const res2 = await fetch(endpoint);
-      const msgs = await res2.json();
-
-      if (!lastCounts[c.id]) {
-        lastCounts[c.id] = msgs.length;
-      }
-
-      if (msgs.length > lastCounts[c.id]) {
-
-        if (c.id !== currentConversationId) {
-          unread[c.id] = (unread[c.id] || 0) + (msgs.length - lastCounts[c.id]);
-          sound.play();
-        }
-
-        if (c.id === currentConversationId) {
-          loadMessages(c.id);
-        }
-
-        lastCounts[c.id] = msgs.length;
-      }
-    }
-
-    loadConversations();
-
-  } catch (e) {
-    console.error("live update error:", e);
-  }
-
-}, 3000);
-
-// ================= INIT =================
-if (user) {
-  loadConversations();
-}
-
 </script>
-
 </body>
 </html>
