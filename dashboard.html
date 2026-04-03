@@ -50,6 +50,18 @@
  <script>
 console.log("SCRIPT WORKING");
 
+let user = null;
+
+try {
+  user = JSON.parse(localStorage.getItem("user"));
+} catch(e){}
+
+if (!user) {
+  window.location.href = "/login.html";
+}
+
+const isAdmin = user.role === "admin";
+   
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 async function createUser() {
