@@ -46,7 +46,6 @@
     <button onclick="sendReply()">Send</button>
   </div>
 </div>
-
 <script>
 
 // ================= USER =================
@@ -57,13 +56,16 @@ try {
 } catch (e) {
   console.log("parse error");
 }
+
 console.log("USER:", user);
-const isAdmin = user.role === "admin";
+
+// default role if not logged
+const isAdmin = user && user.role === "admin";
 
 // hide admin panel if not admin
 if (!isAdmin) {
   const panel = document.getElementById("adminPanel");
-  if (panel) panel.style.display = "none";
+  if (panel) panel.style.display = "block"; // keep visible for signup
 }
 
 // ================= CONFIG =================
@@ -77,6 +79,8 @@ const sound = new Audio("https://www.soundjay.com/buttons/sounds/button-3.mp3");
 
 // ================= HELPERS =================
 function getConversationsURL() {
+  if (!user) return null;
+
   return isAdmin
     ? API + "/admin/conversations"
     : API + "/conversations?site_key=" + user.site_key;
@@ -84,6 +88,8 @@ function getConversationsURL() {
 
 // ================= LOAD CONVERSATIONS =================
 async function loadConversations() {
+  if (!user) return;
+
   try {
     const res = await fetch(getConversationsURL());
     const data = await res.json();
@@ -102,7 +108,7 @@ async function loadConversations() {
 
       let badge = "";
       if (unread[conv.id] > 0) {
-        badge = `<span class="badge">${unread[conv.id]}</span>`;
+        badge = <span class="badge">${unread[conv.id]}</span>;
       }
 
       div.innerHTML = `
@@ -182,7 +188,7 @@ async function sendReply() {
   }
 }
 
-// ================= CREATE USER =================
+// ================= CREATE ACCOUNT (UPDATED) =================
 async function createUser() {
   const email = document.getElementById("newEmail").value;
   const password = document.getElementById("newPassword").value;
@@ -190,7 +196,7 @@ async function createUser() {
   if (!email || !password) return alert("Fill fields");
 
   try {
-    const res = await fetch(API + "/admin/create-user", {
+    const res = await fetch(API + "/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -200,8 +206,28 @@ async function createUser() {
 
     const data = await res.json();
 
-    document.getElementById("result").innerText =
-      "Client created | site_key: " + data.site_key;
+    if (data.site_key) {
+
+      // SAVE USER (VERY IMPORTANT)
+      const userData = {
+        email,
+        role: "user",
+        site_key: data.site_key
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData));
+      user = userData;
+
+      document.getElementById("result").innerText =
+        "✅ Account created | site_key: " + data.site_key;
+
+      // load conversations after signup
+      loadConversations();
+
+    } else {
+      document.getElementById("result").innerText =
+        "❌ Error: " + data.error;
+    }
 
   } catch (e) {
     console.error("createUser error:", e);
@@ -210,6 +236,8 @@ async function createUser() {
 
 // ================= LIVE UPDATES =================
 setInterval(async () => {
+  if (!user) return;
+
   try {
     const res = await fetch(getConversationsURL());
     const convs = await res.json();
@@ -251,8 +279,11 @@ setInterval(async () => {
 }, 3000);
 
 // ================= INIT =================
-loadConversations();
+if (user) {
+  loadConversations();
+}
 
 </script>
+
 </body>
 </html>
