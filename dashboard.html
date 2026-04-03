@@ -62,6 +62,11 @@ if (!user) {
 
 const isAdmin = user.role === "admin";
    
+   if (!isAdmin) {
+  const panel = document.getElementById("adminPanel");
+  if (panel) panel.style.display = "none";
+}
+   
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 async function createUser() {
