@@ -166,7 +166,7 @@ button{
 </div>
 
 <div id="inputBar">
-<input id="input" placeholder="Type your message..." onkeydown="if(event.key==='Enter') send()" />
+<input id="input" placeholder="Type your message..." onkeydown="if(event.key==='Enter'){event.preventDefault();send();}" />
 <button onclick="send()">Send</button>
 </div>
 
@@ -322,7 +322,7 @@ setInterval(async () => {
   if (!conversationId) return;
 
   try {
-    const res = await fetch(${KIRI_API}/admin/messages/${conversationId});
+    const res = await fetch(`${KIRI_API}/admin/messages/${conversationId}`);
     const data = await res.json();
 
     const messages = document.getElementById("messages");
