@@ -24,6 +24,8 @@
 
 <div id="sidebar">
 
+  <button onclick="buy()">Buy</button>
+ 
   <!-- 🔥 ADMIN PANEL -->
   <div id="adminPanel" style="padding:10px; border-bottom:1px solid #ddd;">
     <h3>Create Client</h3>
@@ -92,6 +94,15 @@ async function createUser() {
   } catch (e) {
     console.error(e);
   }
+}
+   async function buy(){
+  const res = await fetch("https://kiri-backend-prod-production.up.railway.app/create-checkout", {
+    method: "POST"
+  });
+
+  const data = await res.json();
+
+  window.location.href = data.url;
 }
 </script>
 </body>
