@@ -95,14 +95,33 @@ async function createUser() {
     console.error(e);
   }
 }
-   async function buy(){
-  const res = await fetch("https://kiri-backend-prod-production.up.railway.app/create-checkout", {
-    method: "POST"
-  });
+async function buy(){
 
-  const data = await res.json();
+  try {
 
-  window.location.href = data.url;
+    const res = await fetch("https://kiri-backend-prod-production.up.railway.app/create-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    const data = await res.json();
+
+    console.log("DATA:", data); // 🔥 DEBUG
+
+    if (!data.url) {
+      alert("Stripe error: no URL returned");
+      return;
+    }
+
+    window.location.href = data.url;
+
+  } catch (err) {
+    console.error("BUY ERROR:", err);
+    alert("Something broke");
+  }
+
 }
 </script>
 </body>
