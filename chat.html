@@ -188,6 +188,7 @@ document.getElementById("close").onclick = () => {
 parent.postMessage("kiri-close","*");
 };
 let sending = false;
+
 async function send(){
 
 if (sending) return;
@@ -202,7 +203,7 @@ sending = false;
 return;
 }
 
-messages.innerHTML += <div class="msg user">${text}</div>;
+messages.innerHTML += `<div class="msg user">${text}</div>`;
 
 input.value="";
 messages.scrollTop=messages.scrollHeight;
@@ -216,7 +217,7 @@ messages.scrollTop=messages.scrollHeight;
 
 try{
 
-const res=await fetch(${KIRI_API}/ask,{
+const res=await fetch(`${KIRI_API}/ask`,{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -239,11 +240,11 @@ messages.removeChild(typing);
 
 if(!res.ok){
 
-messages.innerHTML += <div class="msg bot">${data.error || "Limit reached. Try again later."}</div>;
+messages.innerHTML += `<div class="msg bot">${data.error || "Limit reached. Try again later."}</div>`;
 
 }else{
 
-messages.innerHTML += <div class="msg bot">${data.reply}</div>;
+messages.innerHTML += `<div class="msg bot">${data.reply}</div>`;
 
 if(
   data.reply.toLowerCase().includes("human") ||
@@ -273,7 +274,7 @@ if(btn){
 
 btn.onclick=async()=>{
 
-await fetch(${KIRI_API}/admin/return-to-ai,{
+await fetch(`${KIRI_API}/admin/return-to-ai`,{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
@@ -283,7 +284,7 @@ conversationId
 })
 });
 
-messages.innerHTML += <div class="msg bot">AI assistant reactivated.</div>;
+messages.innerHTML += `<div class="msg bot">AI assistant reactivated.</div>`;
 
 messages.scrollTop=messages.scrollHeight;
 
@@ -307,7 +308,7 @@ sending = false;
 
 messages.removeChild(typing);
 
-messages.innerHTML += <div class="msg bot">Server error. Try again later.</div>;
+messages.innerHTML += `<div class="msg bot">Server error. Try again later.</div>`;
 
 console.error(err);
 
