@@ -99,16 +99,21 @@ async function buy(){
 
   try {
 
+    const site_key = user.site_key; // ✅ GET FROM LOGGED USER
+
     const res = await fetch("https://kiri-backend-prod-production.up.railway.app/create-checkout", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
-      }
+      },
+      body: JSON.stringify({
+        site_key: site_key
+      })
     });
 
     const data = await res.json();
 
-    console.log("DATA:", data); // 🔥 DEBUG
+    console.log("DATA:", data);
 
     if (!data.url) {
       alert("Stripe error: no URL returned");
@@ -123,6 +128,7 @@ async function buy(){
   }
 
 }
+
 </script>
 </body>
 </html>
