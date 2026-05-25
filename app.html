@@ -133,6 +133,12 @@ function startApp(){
   document.getElementById("auth").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
 
+  if (user.role === "admin") {
+    document.body.classList.add("admin");
+  } else {
+    document.body.classList.add("client");
+  }
+
   const siteKey = user.site_key || "missing-site-key";
 
   document.getElementById("siteKeyBox").innerText = siteKey;
@@ -145,11 +151,8 @@ function show(id){
   ["dashboard","pricing","settings","install"].forEach(x=>{
     document.getElementById(x).classList.add("hidden");
   });
+
   document.getElementById(id).classList.remove("hidden");
-  if (user.role === "admin") {
-  document.body.classList.add("admin");
-} else {
-  document.body.classList.add("client");
 }
 
 async function register(){
