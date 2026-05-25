@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kiri AI App</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#0b1020;color:#fff}
+.page{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#0f172a;padding:20px;border-right:1px solid #1e293b}
+.logo{font-size:22px;font-weight:800;margin-bottom:25px}
+.nav button{display:block;width:100%;margin:8px 0;padding:12px;border:0;border-radius:10px;background:#111827;color:#cbd5e1;text-align:left;cursor:pointer}
+.nav button:hover,.nav button.active{background:#2563eb;color:white}
+.main{flex:1;padding:25px;overflow:auto}
+.card{background:#111827;border:1px solid #1e293b;border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.stat h2{margin:0;font-size:28px}
+.stat p{color:#94a3b8;margin:6px 0 0}
+input,textarea{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#020617;color:white;margin:6px 0}
+button.primary{background:#2563eb;color:white;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}
+button.green{background:#16a34a;color:white;border:0;border-radius:10px;padding:12px 18px;cursor:pointer}
+.hidden{display:none}
+.preview{height:360px;background:#020617;border-radius:18px;padding:18px;border:1px solid #334155}
+.chatbox{width:320px;height:320px;background:#111827;border-radius:18px;margin-left:auto;display:flex;flex-direction:column;overflow:hidden;border:1px solid #334155}
+.chatHead{padding:14px;background:#020617;font-weight:700}
+.msg{padding:10px 12px;border-radius:12px;margin:8px;max-width:80%}
+.bot{background:#1e293b}
+.userMsg{background:#2563eb;margin-left:auto}
+.code{background:#020617;color:#22c55e;padding:15px;border-radius:12px;white-space:pre-wrap;word-break:break-all}
+.auth{max-width:420px;margin:80px auto}
+</style>
+</head>
+<body>
+
+<div id="auth" class="auth card">
+  <h1>Kiri AI</h1>
+  <p style="color:#94a3b8">Login or create your account.</p>
+
+  <input id="email" placeholder="Email">
+  <input id="password" placeholder="Password" type="password">
+
+  <button class="primary" onclick="login()">Login</button>
+  <button class="green" onclick="register()">Register</button>
+
+  <p id="authMsg"></p>
+</div>
+
+<div id="app" class="page hidden">
+  <div class="sidebar">
+    <div class="logo">Kiri AI</div>
+    <div class="nav">
+      <button class="active" onclick="show('dashboard')">Dashboard</button>
+      <button onclick="show('pricing')">Billing</button>
+      <button onclick="show('settings')">Bot Settings</button>
+      <button onclick="show('install')">Install</button>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <section id="dashboard">
+      <h1>Welcome 👋</h1>
+      <div class="grid">
+        <div class="card stat"><h2>0</h2><p>Conversations</p></div>
+        <div class="card stat"><h2>0</h2><p>Messages</p></div>
+        <div class="card stat"><h2>0</h2><p>Human Takeovers</p></div>
+        <div class="card stat"><h2>Free</h2><p>Current Plan</p></div>
+      </div>
+
+      <div class="card">
+        <h2>Live Widget Preview</h2>
+        <div class="preview">
+          <div class="chatbox">
+            <div class="chatHead">🟢 Kiri AI</div>
+            <div class="msg bot">Hi! How can I help you?</div>
+            <div class="msg userMsg">I need help</div>
+            <div class="msg bot">Sure — tell me what you need.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="hidden">
+      <h1>Billing</h1>
+      <div class="card">
+        <h2>Pro Plan</h2>
+        <p style="color:#94a3b8">$19.99 / month — unlock full chatbot access.</p>
+        <button class="primary" onclick="buy()">Buy Pro</button>
+      </div>
+    </section>
+
+    <section id="settings" class="hidden">
+      <h1>Bot Settings</h1>
+      <div class="card">
+        <label>Company name</label>
+        <input placeholder="Example: Kiri AI">
+
+        <label>Website</label>
+        <input placeholder="example.com">
+
+        <label>Bot instructions</label>
+        <textarea rows="5" placeholder="Tell the bot how to behave..."></textarea>
+
+        <button class="primary">Save</button>
+      </div>
+    </section>
+
+    <section id="install" class="hidden">
+      <h1>Install Widget</h1>
+      <div class="card">
+        <h2>Your site key</h2>
+        <div class="code" id="siteKeyBox"></div>
+
+        <h2>Paste this before &lt;/body&gt;</h2>
+        <div class="code" id="embedBox"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const API = "https://kiri-backend-prod-production.up.railway.app";
+
+let user = null;
+
+try {
+  user = JSON.parse(localStorage.getItem("user"));
+} catch(e){}
+
+if (user) startApp();
+
+function startApp(){
+  document.getElementById("auth").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+
+  const siteKey = user.site_key || "missing-site-key";
+
+  document.getElementById("siteKeyBox").innerText = siteKey;
+
+  document.getElementById("embedBox").innerText =
+`<script src="https://kiri-backend-prod-production.up.railway.app/widget.js" data-site-key="${siteKey}"><\/script>`;
+}
+
+function show(id){
+  ["dashboard","pricing","settings","install"].forEach(x=>{
+    document.getElementById(x).classList.add("hidden");
+  });
+  document.getElementById(id).classList.remove("hidden");
+}
+
+async function register(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch(API + "/register", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if(!data.site_key){
+    document.getElementById("authMsg").innerText = "Register failed";
+    return;
+  }
+
+  user = {
+    email,
+    role:"user",
+    site_key:data.site_key
+  };
+
+  localStorage.setItem("user", JSON.stringify(user));
+  startApp();
+}
+
+async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch(API + "/login", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if(!data.success){
+    document.getElementById("authMsg").innerText = "Wrong login";
+    return;
+  }
+
+  user = data;
+  localStorage.setItem("user", JSON.stringify(user));
+  startApp();
+}
+
+async function buy(){
+  const res = await fetch(API + "/create-checkout", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      site_key:user.site_key
+    })
+  });
+
+  const data = await res.json();
+
+  if(!data.url){
+    alert("Stripe error");
+    return;
+  }
+
+  window.location.href = data.url;
+}
+
+function logout(){
+  localStorage.removeItem("user");
+  location.reload();
+}
+</script>
+
+</body>
+</html>
