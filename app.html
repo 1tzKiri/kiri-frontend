@@ -6,70 +6,45 @@
 <title>Kiri AI App</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 :root{
   --bg:#070b18;
   --panel:#0f172a;
-  --panel2:#111827;
   --card:#111827;
   --border:#243044;
   --muted:#94a3b8;
   --text:#f8fafc;
   --blue:#2563eb;
-  --blue2:#3b82f6;
   --green:#22c55e;
-  --purple:#a855f7;
-  --yellow:#facc15;
-  --red:#ef4444;
 }
 
 body{
   margin:0;
   font-family:Inter,Arial,sans-serif;
   background:
-    radial-gradient(circle at top left,rgba(37,99,235,.20),transparent 35%),
+    radial-gradient(circle at top left,rgba(37,99,235,.18),transparent 35%),
     radial-gradient(circle at top right,rgba(168,85,247,.12),transparent 30%),
     var(--bg);
   color:var(--text);
 }
 
-.hidden{
-  display:none!important;
-}
+.hidden{display:none!important}
 
-button,input,textarea{
-  font-family:inherit;
-}
+button,input,textarea{font-family:inherit}
 
-.page{
-  display:flex;
-  min-height:100vh;
-}
+.page{display:flex;min-height:100vh}
 
-/* AUTH */
 .auth{
   max-width:430px;
   margin:80px auto;
   padding:28px;
 }
 
-.auth h1{
-  margin:0 0 8px;
-  font-size:32px;
-}
+.auth h1{margin:0 0 8px;font-size:32px}
+.auth p{color:var(--muted)}
 
-.auth p{
-  color:var(--muted);
-}
-
-.authActions{
-  display:flex;
-  gap:10px;
-  margin-top:12px;
-}
+.authActions{display:flex;gap:10px;margin-top:12px}
 
 input,textarea{
   width:100%;
@@ -82,22 +57,16 @@ input,textarea{
   outline:none;
 }
 
-input:focus,textarea:focus{
-  border-color:var(--blue2);
-  box-shadow:0 0 0 3px rgba(37,99,235,.15);
-}
-
-/* SIDEBAR */
 .sidebar{
   width:270px;
-  background:rgba(15,23,42,.88);
+  background:rgba(15,23,42,.9);
   border-right:1px solid var(--border);
   padding:18px;
   display:flex;
   flex-direction:column;
+  height:100vh;
   position:sticky;
   top:0;
-  height:100vh;
 }
 
 .logo{
@@ -114,7 +83,6 @@ input:focus,textarea:focus{
   height:34px;
   border-radius:10px;
   background:linear-gradient(135deg,#2563eb,#22c55e,#a855f7);
-  box-shadow:0 0 25px rgba(37,99,235,.35);
 }
 
 .nav{
@@ -144,12 +112,6 @@ input:focus,textarea:focus{
   color:white;
 }
 
-.navIcon{
-  width:22px;
-  text-align:center;
-  opacity:.95;
-}
-
 .sidebarBottom{
   margin-top:auto;
   display:flex;
@@ -157,20 +119,15 @@ input:focus,textarea:focus{
   gap:14px;
 }
 
-.upgradeBox{
+.upgradeBox,
+.profileBox{
   padding:16px;
   border:1px solid var(--border);
   border-radius:16px;
-  background:linear-gradient(180deg,rgba(37,99,235,.12),rgba(15,23,42,.85));
-}
-
-.upgradeBox h3{
-  margin:0 0 8px;
-  font-size:15px;
+  background:#111827;
 }
 
 .upgradeBox p{
-  margin:0 0 14px;
   color:var(--muted);
   font-size:13px;
   line-height:1.45;
@@ -180,10 +137,6 @@ input:focus,textarea:focus{
   display:flex;
   align-items:center;
   gap:12px;
-  padding:13px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:#111827;
 }
 
 .avatar{
@@ -197,17 +150,11 @@ input:focus,textarea:focus{
   font-weight:900;
 }
 
-.profileBox strong{
-  display:block;
-  font-size:14px;
-}
-
 .profileBox span{
   color:var(--muted);
   font-size:12px;
 }
 
-/* MAIN */
 .main{
   flex:1;
   padding:34px;
@@ -222,15 +169,8 @@ input:focus,textarea:focus{
   margin-bottom:26px;
 }
 
-.topbar h1{
-  margin:0;
-  font-size:30px;
-}
-
-.topbar p{
-  margin:8px 0 0;
-  color:var(--muted);
-}
+.topbar h1{margin:0;font-size:30px}
+.topbar p{margin:8px 0 0;color:var(--muted)}
 
 .badge{
   padding:9px 13px;
@@ -249,19 +189,10 @@ input:focus,textarea:focus{
   box-shadow:0 18px 45px rgba(0,0,0,.25);
 }
 
-.card h2{
-  margin:0 0 16px;
-  font-size:20px;
-}
+.card h2{margin:0 0 16px;font-size:20px}
+.muted{color:var(--muted)}
 
-.muted{
-  color:var(--muted);
-}
-
-.primary,
-.green,
-.ghost,
-.danger{
+.primary,.green,.ghost{
   border:0;
   border-radius:12px;
   padding:12px 16px;
@@ -285,20 +216,11 @@ input:focus,textarea:focus{
   color:white;
 }
 
-.danger{
-  background:rgba(239,68,68,.14);
-  color:#fecaca;
-  border:1px solid rgba(239,68,68,.25);
+button:disabled{
+  opacity:.55;
+  cursor:not-allowed;
 }
 
-.primary:hover,
-.green:hover,
-.ghost:hover,
-.danger:hover{
-  transform:translateY(-1px);
-}
-
-/* STATS */
 .statsGrid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -316,18 +238,6 @@ input:focus,textarea:focus{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
-}
-
-.statIcon{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(37,99,235,.16);
-  font-size:20px;
 }
 
 .stat h3{
@@ -342,8 +252,17 @@ input:focus,textarea:focus{
   margin:5px 0;
 }
 
-.stat small{
-  color:var(--muted);
+.stat small{color:var(--muted)}
+
+.statIcon{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(37,99,235,.16);
+  font-size:20px;
 }
 
 .miniLine{
@@ -352,25 +271,18 @@ input:focus,textarea:focus{
   bottom:23px;
   width:90px;
   height:36px;
-  opacity:.85;
 }
 
-/* DASHBOARD GRID */
 .dashboardGrid{
   display:grid;
   grid-template-columns:1.15fr .85fr;
   gap:20px;
 }
 
-.leftColumn,
-.rightColumn{
+.leftColumn,.rightColumn{
   display:flex;
   flex-direction:column;
   gap:20px;
-}
-
-.analyticsBox{
-  min-height:340px;
 }
 
 .fakeChart{
@@ -382,7 +294,6 @@ input:focus,textarea:focus{
     linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px);
   background-size:70px 42px;
   position:relative;
-  overflow:hidden;
 }
 
 .fakeChart:after{
@@ -394,7 +305,6 @@ input:focus,textarea:focus{
   height:3px;
   background:linear-gradient(90deg,#2563eb,#22c55e,#a855f7);
   border-radius:999px;
-  box-shadow:0 0 20px rgba(37,99,235,.35);
 }
 
 .analyticsStats{
@@ -416,7 +326,6 @@ input:focus,textarea:focus{
   margin-top:6px;
 }
 
-/* WIDGET PREVIEW */
 .preview{
   min-height:430px;
   border-radius:18px;
@@ -424,7 +333,6 @@ input:focus,textarea:focus{
   border:1px solid rgba(148,163,184,.18);
   background:
     radial-gradient(circle at top,rgba(37,99,235,.28),transparent 35%),
-    radial-gradient(circle at bottom right,rgba(168,85,247,.12),transparent 30%),
     #020617;
   display:flex;
   align-items:center;
@@ -440,7 +348,6 @@ input:focus,textarea:focus{
   flex-direction:column;
   overflow:hidden;
   border:1px solid #334155;
-  box-shadow:0 25px 80px rgba(0,0,0,.45);
 }
 
 .chatHead{
@@ -448,20 +355,11 @@ input:focus,textarea:focus{
   background:linear-gradient(135deg,#0f172a,#1d4ed8);
   font-weight:900;
   display:flex;
-  align-items:center;
   justify-content:space-between;
 }
 
-.online{
-  color:#86efac;
-  font-size:12px;
-  margin-top:4px;
-}
-
-.chatBody{
-  padding:14px;
-  flex:1;
-}
+.online{color:#86efac;font-size:12px;margin-top:4px}
+.chatBody{padding:14px;flex:1}
 
 .msg{
   padding:11px 13px;
@@ -469,17 +367,10 @@ input:focus,textarea:focus{
   margin:10px 0;
   max-width:82%;
   font-size:14px;
-  line-height:1.35;
 }
 
-.bot{
-  background:#1e293b;
-}
-
-.userMsg{
-  background:#2563eb;
-  margin-left:auto;
-}
+.bot{background:#1e293b}
+.userMsg{background:#2563eb;margin-left:auto}
 
 .chatInput{
   margin:12px;
@@ -492,7 +383,6 @@ input:focus,textarea:focus{
   justify-content:space-between;
 }
 
-/* QUICK ACTIONS */
 .quickGrid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -523,17 +413,11 @@ input:focus,textarea:focus{
   margin-bottom:12px;
 }
 
-.quickCard strong{
-  display:block;
-  margin-bottom:5px;
-}
-
 .quickCard span{
   color:var(--muted);
   font-size:13px;
 }
 
-/* EMPTY */
 .emptyState{
   min-height:190px;
   display:flex;
@@ -551,7 +435,6 @@ input:focus,textarea:focus{
   margin-bottom:6px;
 }
 
-/* OTHER PAGES */
 .pageGrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -594,57 +477,39 @@ input:focus,textarea:focus{
   margin-bottom:10px;
 }
 
-.adminPanel{
-  border-color:rgba(250,204,21,.35);
+.conversationItem{
+  padding:16px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#0f172a;
+  margin-bottom:12px;
+  cursor:pointer;
 }
 
-.adminOnly{
-  display:flex;
+.conversationItem:hover{
+  border-color:#3b82f6;
+  background:rgba(37,99,235,.12);
 }
 
-body.client .adminOnly{
-  display:none!important;
-}
+.adminOnly{display:flex}
+body.client .adminOnly{display:none!important}
 
 @media(max-width:1200px){
-  .statsGrid,
-  .quickGrid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .dashboardGrid,
-  .pageGrid{
-    grid-template-columns:1fr;
-  }
+  .statsGrid,.quickGrid{grid-template-columns:repeat(2,1fr)}
+  .dashboardGrid,.pageGrid{grid-template-columns:1fr}
 }
 
 @media(max-width:800px){
-  .page{
-    flex-direction:column;
-  }
-
-  .sidebar{
-    width:100%;
-    height:auto;
-    position:relative;
-  }
-
-  .statsGrid,
-  .quickGrid,
-  .installSteps{
-    grid-template-columns:1fr;
-  }
-
-  .main{
-    padding:20px;
-  }
+  .page{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:relative}
+  .statsGrid,.quickGrid,.installSteps{grid-template-columns:1fr}
+  .main{padding:20px}
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUTH -->
 <div id="auth" class="auth card">
   <h1>Kiri AI</h1>
   <p>Login or create your account.</p>
@@ -660,10 +525,8 @@ body.client .adminOnly{
   <p id="authMsg"></p>
 </div>
 
-<!-- APP -->
 <div id="app" class="page hidden">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div>
       <div class="logo">
@@ -672,46 +535,20 @@ body.client .adminOnly{
       </div>
 
       <nav class="nav">
-        <button class="active" data-page="dashboard" onclick="show('dashboard', this)">
-          <span class="navIcon">🏠</span> Overview
-        </button>
-
-        <button data-page="conversations" onclick="show('conversations', this)">
-          <span class="navIcon">💬</span> Conversations
-        </button>
-
-        <button data-page="knowledge" onclick="show('knowledge', this)">
-          <span class="navIcon">🧠</span> Knowledge Base
-        </button>
-
-        <button data-page="settings" onclick="show('settings', this)">
-          <span class="navIcon">⚙️</span> Widget Settings
-        </button>
-
-        <button data-page="install" onclick="show('install', this)">
-          <span class="navIcon">📥</span> Install Widget
-        </button>
-
-        <button data-page="analytics" onclick="show('analytics', this)">
-          <span class="navIcon">📊</span> Analytics
-        </button>
-
-        <button data-page="pricing" onclick="show('pricing', this)">
-          <span class="navIcon">💳</span> Billing
-        </button>
-
-        <button class="adminOnly" data-page="admin" onclick="show('admin', this)">
-          <span class="navIcon">👑</span> Admin Panel
-        </button>
-
-        <button onclick="logout()">
-          <span class="navIcon">🚪</span> Logout
-        </button>
+        <button class="active" data-page="dashboard" onclick="show('dashboard', this)">🏠 Overview</button>
+        <button data-page="conversations" onclick="show('conversations', this)">💬 Conversations</button>
+        <button data-page="knowledge" onclick="show('knowledge', this)">🧠 Knowledge Base</button>
+        <button data-page="settings" onclick="show('settings', this)">⚙️ Widget Settings</button>
+        <button data-page="install" onclick="show('install', this)">📥 Install Widget</button>
+        <button data-page="analytics" onclick="show('analytics', this)">📊 Analytics</button>
+        <button data-page="pricing" onclick="show('pricing', this)">💳 Billing</button>
+        <button class="adminOnly" data-page="admin" onclick="show('admin', this)">👑 Admin Panel</button>
+        <button onclick="logout()">🚪 Logout</button>
       </nav>
     </div>
 
     <div class="sidebarBottom">
-      <div class="upgradeBox">
+      <div class="upgradeBox" id="upgradeBox">
         <h3>Upgrade Plan</h3>
         <p>Unlock more messages, advanced settings and remove branding.</p>
         <button class="primary" style="width:100%" onclick="show('pricing')">Upgrade Now →</button>
@@ -720,17 +557,15 @@ body.client .adminOnly{
       <div class="profileBox">
         <div class="avatar" id="avatarLetter">K</div>
         <div>
-          <strong id="profileEmail">Kiri AI User</strong>
+          <strong id="profileEmail">Kiri AI User</strong><br>
           <span id="profilePlan">Free Plan</span>
         </div>
       </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- DASHBOARD -->
     <section id="dashboard">
       <div class="topbar">
         <div>
@@ -750,9 +585,6 @@ body.client .adminOnly{
             </div>
             <div class="statIcon">💬</div>
           </div>
-          <svg class="miniLine" viewBox="0 0 100 40">
-            <path d="M5 30 L20 20 L35 25 L50 10 L65 18 L80 8 L95 22" fill="none" stroke="#3b82f6" stroke-width="4" stroke-linecap="round"/>
-          </svg>
         </div>
 
         <div class="card stat">
@@ -762,11 +594,8 @@ body.client .adminOnly{
               <div class="statValue" id="statMessages">0</div>
               <small>-- vs last 7 days</small>
             </div>
-            <div class="statIcon" style="background:rgba(34,197,94,.16)">✉️</div>
+            <div class="statIcon">✉️</div>
           </div>
-          <svg class="miniLine" viewBox="0 0 100 40">
-            <path d="M5 31 L20 29 L35 18 L50 24 L65 6 L80 28 L95 20" fill="none" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
-          </svg>
         </div>
 
         <div class="card stat">
@@ -776,11 +605,8 @@ body.client .adminOnly{
               <div class="statValue" id="statTakeovers">0</div>
               <small>-- vs last 7 days</small>
             </div>
-            <div class="statIcon" style="background:rgba(168,85,247,.16)">👤</div>
+            <div class="statIcon">👤</div>
           </div>
-          <svg class="miniLine" viewBox="0 0 100 40">
-            <path d="M5 32 L20 18 L35 22 L50 12 L65 30 L80 7 L95 25" fill="none" stroke="#a855f7" stroke-width="4" stroke-linecap="round"/>
-          </svg>
         </div>
 
         <div class="card stat">
@@ -788,65 +614,33 @@ body.client .adminOnly{
             <div>
               <h3>Current Plan</h3>
               <div class="statValue" id="statPlan">Free</div>
-              <small>Upgrade to unlock more features.</small>
+              <small id="planSubtext">Upgrade to unlock more features.</small>
             </div>
-            <div class="statIcon" style="background:rgba(250,204,21,.16)">⭐</div>
+            <div class="statIcon">⭐</div>
           </div>
         </div>
       </div>
 
       <div class="dashboardGrid">
         <div class="leftColumn">
-          <div class="card analyticsBox">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px">
-              <h2 style="margin:0">Analytics Overview</h2>
-              <button class="ghost">Last 7 days</button>
-            </div>
-
+          <div class="card">
+            <h2>Analytics Overview</h2>
             <div class="fakeChart"></div>
 
             <div class="analyticsStats">
-              <div class="smallMetric">
-                <span class="muted">Avg. Response Time</span>
-                <strong>--</strong>
-              </div>
-              <div class="smallMetric">
-                <span class="muted">Resolution Rate</span>
-                <strong>--</strong>
-              </div>
-              <div class="smallMetric">
-                <span class="muted">Satisfaction Rate</span>
-                <strong>--</strong>
-              </div>
+              <div class="smallMetric"><span class="muted">Avg. Response Time</span><strong>--</strong></div>
+              <div class="smallMetric"><span class="muted">Resolution Rate</span><strong>--</strong></div>
+              <div class="smallMetric"><span class="muted">Satisfaction Rate</span><strong>--</strong></div>
             </div>
           </div>
 
           <div class="card">
             <h2>Quick Actions</h2>
             <div class="quickGrid">
-              <div class="quickCard" onclick="show('knowledge')">
-                <div class="quickIcon">🧠</div>
-                <strong>Train Knowledge</strong>
-                <span>Add website or content</span>
-              </div>
-
-              <div class="quickCard" onclick="show('settings')">
-                <div class="quickIcon" style="background:#7e22ce">🎨</div>
-                <strong>Customize Widget</strong>
-                <span>Change appearance</span>
-              </div>
-
-              <div class="quickCard" onclick="show('install')">
-                <div class="quickIcon" style="background:#15803d">📥</div>
-                <strong>Install Widget</strong>
-                <span>Get installation code</span>
-              </div>
-
-              <div class="quickCard" onclick="show('conversations')">
-                <div class="quickIcon" style="background:#ca8a04">💬</div>
-                <strong>View Conversations</strong>
-                <span>See all chats</span>
-              </div>
+              <div class="quickCard" onclick="show('knowledge')"><div class="quickIcon">🧠</div><strong>Train Knowledge</strong><br><span>Add website or content</span></div>
+              <div class="quickCard" onclick="show('settings')"><div class="quickIcon">🎨</div><strong>Customize Widget</strong><br><span>Change appearance</span></div>
+              <div class="quickCard" onclick="show('install')"><div class="quickIcon">📥</div><strong>Install Widget</strong><br><span>Get installation code</span></div>
+              <div class="quickCard" onclick="show('conversations')"><div class="quickIcon">💬</div><strong>View Conversations</strong><br><span>See all chats</span></div>
             </div>
           </div>
         </div>
@@ -861,23 +655,15 @@ body.client .adminOnly{
             <div class="preview">
               <div class="chatbox">
                 <div class="chatHead">
-                  <div>
-                    Kiri AI
-                    <div class="online">Online</div>
-                  </div>
+                  <div>Kiri AI<div class="online">Online</div></div>
                   <div>×</div>
                 </div>
-
                 <div class="chatBody">
                   <div class="msg bot">Hi! How can I help you today?</div>
                   <div class="msg userMsg">I need help with something.</div>
                   <div class="msg bot">Of course! I’m here to help.</div>
                 </div>
-
-                <div class="chatInput">
-                  <span>Type your message...</span>
-                  <span>➤</span>
-                </div>
+                <div class="chatInput"><span>Type your message...</span><span>➤</span></div>
               </div>
             </div>
           </div>
@@ -887,8 +673,7 @@ body.client .adminOnly{
               <h2 style="margin:0">Recent Conversations</h2>
               <button class="ghost" onclick="show('conversations')">View all</button>
             </div>
-
-            <div class="emptyState">
+            <div id="recentConversationList" class="emptyState">
               <div>
                 <strong>No conversations yet</strong>
                 Your conversations will appear here.
@@ -899,7 +684,6 @@ body.client .adminOnly{
       </div>
     </section>
 
-    <!-- CONVERSATIONS -->
     <section id="conversations" class="hidden">
       <div class="topbar">
         <div>
@@ -909,16 +693,17 @@ body.client .adminOnly{
       </div>
 
       <div class="card">
-        <div class="emptyState">
-          <div>
-            <strong>No conversations yet</strong>
-            Once people use your widget, chats will appear here.
+        <div id="conversationList" class="conversationList">
+          <div class="emptyState">
+            <div>
+              <strong>No conversations yet</strong>
+              Once people use your widget, chats will appear here.
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- KNOWLEDGE -->
     <section id="knowledge" class="hidden">
       <div class="topbar">
         <div>
@@ -930,21 +715,18 @@ body.client .adminOnly{
       <div class="pageGrid">
         <div class="card">
           <h2>Add Website</h2>
-          <p class="muted">Paste your website URL and let Kiri AI learn from it.</p>
           <input id="knowledgeUrl" placeholder="https://example.com" />
           <button class="primary">Scrape Website</button>
         </div>
 
         <div class="card">
           <h2>Manual Instructions</h2>
-          <p class="muted">Add extra knowledge, FAQs or rules for your bot.</p>
           <textarea rows="8" placeholder="Example: We ship in 2-4 working days..."></textarea>
           <button class="primary">Save Knowledge</button>
         </div>
       </div>
     </section>
 
-    <!-- SETTINGS -->
     <section id="settings" class="hidden">
       <div class="topbar">
         <div>
@@ -956,37 +738,28 @@ body.client .adminOnly{
       <div class="pageGrid">
         <div class="card">
           <h2>Business Settings</h2>
-
           <label>Company name</label>
           <input placeholder="Example: Kiri AI" />
-
           <label>Website</label>
           <input placeholder="example.com" />
-
           <label>Bot instructions</label>
           <textarea rows="6" placeholder="Tell the bot how to behave..."></textarea>
-
           <button class="primary">Save Settings</button>
         </div>
 
         <div class="card">
           <h2>Appearance</h2>
-
           <label>Widget title</label>
           <input placeholder="Kiri AI" />
-
           <label>Primary color</label>
           <input placeholder="#2563eb" />
-
           <label>Welcome message</label>
           <input placeholder="Hi! How can I help you?" />
-
           <button class="primary">Save Appearance</button>
         </div>
       </div>
     </section>
 
-    <!-- INSTALL -->
     <section id="install" class="hidden">
       <div class="topbar">
         <div>
@@ -996,23 +769,9 @@ body.client .adminOnly{
       </div>
 
       <div class="installSteps">
-        <div class="step">
-          <div class="stepNumber">1</div>
-          <strong>Copy script</strong>
-          <p class="muted">Use the script generated for your site.</p>
-        </div>
-
-        <div class="step">
-          <div class="stepNumber">2</div>
-          <strong>Paste before &lt;/body&gt;</strong>
-          <p class="muted">Add it to your website HTML.</p>
-        </div>
-
-        <div class="step">
-          <div class="stepNumber">3</div>
-          <strong>Go live</strong>
-          <p class="muted">Your AI widget appears on your site.</p>
-        </div>
+        <div class="step"><div class="stepNumber">1</div><strong>Copy script</strong><p class="muted">Use the script generated for your site.</p></div>
+        <div class="step"><div class="stepNumber">2</div><strong>Paste before &lt;/body&gt;</strong><p class="muted">Add it to your website HTML.</p></div>
+        <div class="step"><div class="stepNumber">3</div><strong>Go live</strong><p class="muted">Your AI widget appears on your site.</p></div>
       </div>
 
       <div class="card">
@@ -1024,14 +783,12 @@ body.client .adminOnly{
         <h2>Paste this before &lt;/body&gt;</h2>
         <div class="code" id="embedBox"></div>
 
-        <div style="margin-top:15px;display:flex;gap:10px;flex-wrap:wrap">
+        <div style="margin-top:15px">
           <button class="primary" onclick="copyEmbed()">Copy Install Code</button>
-          <button class="ghost" onclick="alert('Paste the code before </body> on your website.')">Need help?</button>
         </div>
       </div>
     </section>
 
-    <!-- ANALYTICS -->
     <section id="analytics" class="hidden">
       <div class="topbar">
         <div>
@@ -1040,28 +797,18 @@ body.client .adminOnly{
         </div>
       </div>
 
-      <div class="card analyticsBox">
+      <div class="card">
         <h2>Usage Analytics</h2>
         <div class="fakeChart"></div>
 
         <div class="analyticsStats">
-          <div class="smallMetric">
-            <span class="muted">Total Conversations</span>
-            <strong id="analyticsConversations">0</strong>
-          </div>
-          <div class="smallMetric">
-            <span class="muted">Total Messages</span>
-            <strong id="analyticsMessages">0</strong>
-          </div>
-          <div class="smallMetric">
-            <span class="muted">Human Takeovers</span>
-            <strong id="analyticsTakeovers">0</strong>
-          </div>
+          <div class="smallMetric"><span class="muted">Total Conversations</span><strong id="analyticsConversations">0</strong></div>
+          <div class="smallMetric"><span class="muted">Total Messages</span><strong id="analyticsMessages">0</strong></div>
+          <div class="smallMetric"><span class="muted">Human Takeovers</span><strong id="analyticsTakeovers">0</strong></div>
         </div>
       </div>
     </section>
 
-    <!-- BILLING -->
     <section id="pricing" class="hidden">
       <div class="topbar">
         <div>
@@ -1072,61 +819,30 @@ body.client .adminOnly{
 
       <div class="pageGrid">
         <div class="card">
-          <h2>Free Plan</h2>
-          <p class="muted">Basic chatbot access for testing.</p>
-          <button class="ghost">Current Plan</button>
+          <h2 id="billingCurrentPlan">Free Plan</h2>
+          <p class="muted" id="billingPlanText">Basic chatbot access for testing.</p>
+          <button class="ghost" id="billingCurrentBtn">Current Plan</button>
         </div>
 
         <div class="card">
           <h2>Pro Plan</h2>
           <p class="muted">$19.99 / month — unlock full chatbot access.</p>
-          <button class="primary" onclick="buy()">Buy Pro</button>
+          <button class="primary" id="proBuyBtn" onclick="buy()">Buy Pro</button>
         </div>
       </div>
     </section>
 
-    <!-- ADMIN -->
     <section id="admin" class="hidden adminOnly">
       <div class="topbar">
         <div>
           <h1>Admin Panel 👑</h1>
           <p>Internal Kiri AI overview. Clients should not see this.</p>
         </div>
-        <div class="badge">Admin only</div>
-      </div>
-
-      <div class="statsGrid">
-        <div class="card stat adminPanel">
-          <h3>All Users</h3>
-          <div class="statValue">--</div>
-          <small>Backend connection later</small>
-        </div>
-
-        <div class="card stat adminPanel">
-          <h3>All Sites</h3>
-          <div class="statValue">--</div>
-          <small>Backend connection later</small>
-        </div>
-
-        <div class="card stat adminPanel">
-          <h3>All Conversations</h3>
-          <div class="statValue">--</div>
-          <small>Backend connection later</small>
-        </div>
-
-        <div class="card stat adminPanel">
-          <h3>Revenue</h3>
-          <div class="statValue">--</div>
-          <small>Stripe webhook later</small>
-        </div>
       </div>
 
       <div class="card">
         <h2>Admin Notes</h2>
-        <p class="muted">
-          This page is only visible for users with role = admin. Later, your backend should return all users,
-          all sites, all conversations and system usage here.
-        </p>
+        <p class="muted">Admin tools will go here after backend cleanup.</p>
       </div>
     </section>
 
@@ -1165,7 +881,6 @@ function startApp(){
   document.getElementById("profileEmail").innerText = email;
   document.getElementById("profilePlan").innerText = plan + " Plan";
   document.getElementById("avatarLetter").innerText = email.charAt(0).toUpperCase();
-
   document.getElementById("statPlan").innerText = plan;
   document.getElementById("siteKeyBox").innerText = siteKey;
 
@@ -1176,16 +891,7 @@ function startApp(){
 }
 
 function show(id, btn){
-  const pages = [
-    "dashboard",
-    "conversations",
-    "knowledge",
-    "settings",
-    "install",
-    "analytics",
-    "pricing",
-    "admin"
-  ];
+  const pages = ["dashboard","conversations","knowledge","settings","install","analytics","pricing","admin"];
 
   pages.forEach(x=>{
     const el = document.getElementById(x);
@@ -1195,15 +901,17 @@ function show(id, btn){
   const target = document.getElementById(id);
   if(target) target.classList.remove("hidden");
 
-  document.querySelectorAll(".nav button").forEach(b=>{
-    b.classList.remove("active");
-  });
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
 
   if(btn){
     btn.classList.add("active");
   } else {
     const found = document.querySelector(`.nav button[data-page="${id}"]`);
     if(found) found.classList.add("active");
+  }
+
+  if(id === "conversations"){
+    loadConversations();
   }
 }
 
@@ -1230,8 +938,9 @@ async function register(){
   }
 
   user = {
-    email,
-    role:"user",
+    id:data.id,
+    email:data.email || email,
+    role:data.role || "user",
     site_key:data.site_key,
     plan:"Free"
   };
@@ -1271,9 +980,7 @@ async function buy(){
   const res = await fetch(API + "/create-checkout", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      site_key:user.site_key
-    })
+    body:JSON.stringify({ site_key:user.site_key })
   });
 
   const data = await res.json();
@@ -1297,10 +1004,6 @@ function logout(){
   location.reload();
 }
 
-/*
-  This is ready for your backend later.
-  For now it keeps safe placeholder numbers.
-*/
 async function loadDashboardData(){
   try{
     const usageRes = await fetch(API + "/site-usage", {
@@ -1312,8 +1015,25 @@ async function loadDashboardData(){
     const usage = await usageRes.json();
 
     if(usage.plan){
-      document.getElementById("statPlan").innerText = usage.plan;
-      document.getElementById("profilePlan").innerText = usage.plan + " Plan";
+      const cleanPlan = usage.plan.toLowerCase();
+      const displayPlan = cleanPlan.charAt(0).toUpperCase() + cleanPlan.slice(1);
+
+      document.getElementById("statPlan").innerText = displayPlan;
+      document.getElementById("profilePlan").innerText = displayPlan + " Plan";
+      document.getElementById("billingCurrentPlan").innerText = displayPlan + " Plan";
+
+      if(cleanPlan === "pro"){
+        document.getElementById("planSubtext").innerText = "You are currently on Pro.";
+        document.getElementById("billingPlanText").innerText = "You are currently on the Pro plan.";
+        document.getElementById("proBuyBtn").innerText = "Already on Pro";
+        document.getElementById("proBuyBtn").disabled = true;
+        document.getElementById("upgradeBox").style.display = "none";
+      } else {
+        document.getElementById("planSubtext").innerText = "Upgrade to unlock more features.";
+        document.getElementById("billingPlanText").innerText = "Basic chatbot access for testing.";
+        document.getElementById("proBuyBtn").innerText = "Buy Pro";
+        document.getElementById("proBuyBtn").disabled = false;
+      }
     }
 
     if(usage.monthlyUsed !== undefined){
@@ -1324,11 +1044,74 @@ async function loadDashboardData(){
     const convRes = await fetch(API + "/conversations?site_key=" + user.site_key);
     const conversations = await convRes.json();
 
-    document.getElementById("statConversations").innerText = conversations.length || 0;
-    document.getElementById("analyticsConversations").innerText = conversations.length || 0;
+    if(Array.isArray(conversations)){
+      document.getElementById("statConversations").innerText = conversations.length;
+      document.getElementById("analyticsConversations").innerText = conversations.length;
+
+      renderRecentConversations(conversations);
+    }
 
   }catch(err){
     console.log("Dashboard stats not loaded yet", err);
+  }
+}
+
+function renderRecentConversations(conversations){
+  const box = document.getElementById("recentConversationList");
+  if(!box) return;
+
+  if(!Array.isArray(conversations) || conversations.length === 0){
+    box.className = "emptyState";
+    box.innerHTML = `
+      <div>
+        <strong>No conversations yet</strong>
+        Your conversations will appear here.
+      </div>
+    `;
+    return;
+  }
+
+  box.className = "";
+  box.innerHTML = conversations.slice(0,3).map(c => `
+    <div class="conversationItem">
+      <strong>Conversation #${c.id}</strong>
+      <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
+    </div>
+  `).join("");
+}
+
+async function loadConversations(){
+  const box = document.getElementById("conversationList");
+  if(!box) return;
+
+  box.innerHTML = `<p class="muted">Loading conversations...</p>`;
+
+  try{
+    const res = await fetch(API + "/conversations?site_key=" + user.site_key);
+    const conversations = await res.json();
+
+    if(!Array.isArray(conversations) || conversations.length === 0){
+      box.innerHTML = `
+        <div class="emptyState">
+          <div>
+            <strong>No conversations yet</strong>
+            Once people use your widget, chats will appear here.
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = conversations.map(c => `
+      <div class="conversationItem">
+        <strong>Conversation #${c.id}</strong>
+        <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
+      </div>
+    `).join("");
+
+  }catch(err){
+    console.log(err);
+    box.innerHTML = `<p class="muted">Could not load conversations.</p>`;
   }
 }
 </script>
