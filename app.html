@@ -7,506 +7,85 @@
 
 <style>
 *{box-sizing:border-box}
-
-:root{
-  --bg:#070b18;
-  --panel:#0f172a;
-  --card:#111827;
-  --border:#243044;
-  --muted:#94a3b8;
-  --text:#f8fafc;
-  --blue:#2563eb;
-  --green:#22c55e;
-}
-
-body{
-  margin:0;
-  font-family:Inter,Arial,sans-serif;
-  background:
-    radial-gradient(circle at top left,rgba(37,99,235,.18),transparent 35%),
-    radial-gradient(circle at top right,rgba(168,85,247,.12),transparent 30%),
-    var(--bg);
-  color:var(--text);
-}
-
+:root{--bg:#070b18;--card:#111827;--border:#243044;--muted:#94a3b8;--text:#f8fafc;--blue:#2563eb;--green:#22c55e;--red:#ef4444}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:radial-gradient(circle at top left,rgba(37,99,235,.18),transparent 35%),radial-gradient(circle at top right,rgba(168,85,247,.12),transparent 30%),var(--bg);color:var(--text)}
 .hidden{display:none!important}
 button,input,textarea{font-family:inherit}
-
 .page{display:flex;min-height:100vh}
-
-.auth{
-  max-width:430px;
-  margin:80px auto;
-  padding:28px;
-}
-
+.auth{max-width:430px;margin:80px auto;padding:28px}
 .auth h1{margin:0 0 8px;font-size:32px}
-.auth p{color:var(--muted)}
+.auth p,.muted{color:var(--muted)}
 .authActions{display:flex;gap:10px;margin-top:12px}
-
-input,textarea{
-  width:100%;
-  padding:13px 14px;
-  border-radius:12px;
-  border:1px solid #334155;
-  background:#020617;
-  color:white;
-  margin:8px 0 14px;
-  outline:none;
-}
-
-.sidebar{
-  width:270px;
-  background:rgba(15,23,42,.9);
-  border-right:1px solid var(--border);
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  height:100vh;
-  position:sticky;
-  top:0;
-}
-
-.logo{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:24px;
-  font-weight:900;
-  margin-bottom:26px;
-}
-
-.logoMark{
-  width:34px;
-  height:34px;
-  border-radius:10px;
-  background:linear-gradient(135deg,#2563eb,#22c55e,#a855f7);
-}
-
-.nav{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.nav button{
-  width:100%;
-  padding:13px 14px;
-  border:0;
-  border-radius:12px;
-  background:transparent;
-  color:#cbd5e1;
-  text-align:left;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:11px;
-  font-weight:700;
-}
-
-.nav button:hover,
-.nav button.active{
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  color:white;
-}
-
-.sidebarBottom{
-  margin-top:auto;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.upgradeBox,
-.profileBox{
-  padding:16px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:#111827;
-}
-
-.upgradeBox p{
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.45;
-}
-
-.profileBox{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.avatar{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-}
-
-.profileBox span{
-  color:var(--muted);
-  font-size:12px;
-}
-
-.main{
-  flex:1;
-  padding:34px;
-  overflow:auto;
-}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:20px;
-  margin-bottom:26px;
-}
-
+input,textarea{width:100%;padding:13px 14px;border-radius:12px;border:1px solid #334155;background:#020617;color:white;margin:8px 0 14px;outline:none}
+.sidebar{width:270px;background:rgba(15,23,42,.9);border-right:1px solid var(--border);padding:18px;display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
+.logo{display:flex;align-items:center;gap:12px;font-size:24px;font-weight:900;margin-bottom:26px}
+.logoMark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#22c55e,#a855f7)}
+.nav{display:flex;flex-direction:column;gap:8px}
+.nav button{width:100%;padding:13px 14px;border:0;border-radius:12px;background:transparent;color:#cbd5e1;text-align:left;cursor:pointer;display:flex;align-items:center;gap:11px;font-weight:700;position:relative}
+.nav button:hover,.nav button.active{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:white}
+.navBadge{margin-left:auto;min-width:22px;height:22px;border-radius:999px;background:var(--red);color:white;font-size:12px;display:none;align-items:center;justify-content:center;padding:0 7px}
+.navBadge.show{display:flex}
+.sidebarBottom{margin-top:auto;display:flex;flex-direction:column;gap:14px}
+.upgradeBox,.profileBox{padding:16px;border:1px solid var(--border);border-radius:16px;background:#111827}
+.upgradeBox p{color:var(--muted);font-size:13px;line-height:1.45}
+.profileBox{display:flex;align-items:center;gap:12px}
+.avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#3b82f6);display:flex;align-items:center;justify-content:center;font-weight:900}
+.profileBox span{color:var(--muted);font-size:12px}
+.main{flex:1;padding:34px;overflow:auto}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:26px}
 .topbar h1{margin:0;font-size:30px}
 .topbar p{margin:8px 0 0;color:var(--muted)}
-
-.badge{
-  padding:9px 13px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  color:#cbd5e1;
-  background:#0f172a;
-  font-size:13px;
-}
-
-.card{
-  background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.92));
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:20px;
-  box-shadow:0 18px 45px rgba(0,0,0,.25);
-}
-
+.badge{padding:9px 13px;border-radius:999px;border:1px solid var(--border);color:#cbd5e1;background:#0f172a;font-size:13px}
+.card{background:linear-gradient(180deg,rgba(17,24,39,.96),rgba(15,23,42,.92));border:1px solid var(--border);border-radius:20px;padding:20px;box-shadow:0 18px 45px rgba(0,0,0,.25)}
 .card h2{margin:0 0 16px;font-size:20px}
-.muted{color:var(--muted)}
-
-.primary,.green,.ghost{
-  border:0;
-  border-radius:12px;
-  padding:12px 16px;
-  cursor:pointer;
-  font-weight:800;
-}
-
-.primary{
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
-  color:white;
-}
-
-.green{
-  background:linear-gradient(135deg,#16a34a,#22c55e);
-  color:white;
-}
-
-.ghost{
-  background:#0f172a;
-  border:1px solid var(--border);
-  color:white;
-}
-
-button:disabled{
-  opacity:.55;
-  cursor:not-allowed;
-}
-
-.statsGrid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:18px;
-  margin-bottom:20px;
-}
-
-.stat{
-  min-height:135px;
-  position:relative;
-  overflow:hidden;
-}
-
-.statTop{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.stat h3{
-  margin:0;
-  color:#cbd5e1;
-  font-size:15px;
-}
-
-.statValue{
-  font-size:31px;
-  font-weight:900;
-  margin:5px 0;
-}
-
+.primary,.green,.ghost{border:0;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800}
+.primary{background:linear-gradient(135deg,#2563eb,#3b82f6);color:white}
+.green{background:linear-gradient(135deg,#16a34a,#22c55e);color:white}
+.ghost{background:#0f172a;border:1px solid var(--border);color:white}
+button:disabled{opacity:.55;cursor:not-allowed}
+.statsGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:20px}
+.stat{min-height:135px}
+.statTop{display:flex;justify-content:space-between;align-items:center}
+.stat h3{margin:0;color:#cbd5e1;font-size:15px}
+.statValue{font-size:31px;font-weight:900;margin:5px 0}
 .stat small{color:var(--muted)}
-
-.statIcon{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:rgba(37,99,235,.16);
-  font-size:20px;
-}
-
-.dashboardGrid{
-  display:grid;
-  grid-template-columns:1.15fr .85fr;
-  gap:20px;
-}
-
-.leftColumn,.rightColumn{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
-
-.fakeChart{
-  height:210px;
-  border-radius:16px;
-  border:1px solid rgba(148,163,184,.15);
-  background:
-    linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px);
-  background-size:70px 42px;
-  position:relative;
-}
-
-.fakeChart:after{
-  content:"";
-  position:absolute;
-  left:25px;
-  right:25px;
-  bottom:38px;
-  height:3px;
-  background:linear-gradient(90deg,#2563eb,#22c55e,#a855f7);
-  border-radius:999px;
-}
-
-.analyticsStats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-top:16px;
-}
-
-.smallMetric{
-  padding:14px;
-  border:1px solid rgba(148,163,184,.15);
-  background:rgba(2,6,23,.35);
-  border-radius:16px;
-}
-
-.smallMetric strong{
-  display:block;
-  margin-top:6px;
-}
-
-.preview{
-  min-height:430px;
-  border-radius:18px;
-  padding:26px;
-  border:1px solid rgba(148,163,184,.18);
-  background:
-    radial-gradient(circle at top,rgba(37,99,235,.28),transparent 35%),
-    #020617;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.chatbox{
-  width:350px;
-  height:390px;
-  background:#111827;
-  border-radius:22px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  border:1px solid #334155;
-}
-
-.chatHead{
-  padding:16px;
-  background:linear-gradient(135deg,#0f172a,#1d4ed8);
-  font-weight:900;
-  display:flex;
-  justify-content:space-between;
-}
-
+.statIcon{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(37,99,235,.16);font-size:20px}
+.dashboardGrid{display:grid;grid-template-columns:1.15fr .85fr;gap:20px}
+.leftColumn,.rightColumn{display:flex;flex-direction:column;gap:20px}
+.fakeChart{height:210px;border-radius:16px;border:1px solid rgba(148,163,184,.15);background:linear-gradient(rgba(148,163,184,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.08) 1px,transparent 1px);background-size:70px 42px;position:relative}
+.fakeChart:after{content:"";position:absolute;left:25px;right:25px;bottom:38px;height:3px;background:linear-gradient(90deg,#2563eb,#22c55e,#a855f7);border-radius:999px}
+.analyticsStats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.smallMetric{padding:14px;border:1px solid rgba(148,163,184,.15);background:rgba(2,6,23,.35);border-radius:16px}
+.smallMetric strong{display:block;margin-top:6px}
+.preview{min-height:430px;border-radius:18px;padding:26px;border:1px solid rgba(148,163,184,.18);background:radial-gradient(circle at top,rgba(37,99,235,.28),transparent 35%),#020617;display:flex;align-items:center;justify-content:center}
+.chatbox{width:350px;height:390px;background:#111827;border-radius:22px;display:flex;flex-direction:column;overflow:hidden;border:1px solid #334155}
+.chatHead{padding:16px;background:linear-gradient(135deg,#0f172a,#1d4ed8);font-weight:900;display:flex;justify-content:space-between}
 .online{color:#86efac;font-size:12px;margin-top:4px}
 .chatBody{padding:14px;flex:1}
-
-.msg{
-  padding:11px 13px;
-  border-radius:13px;
-  margin:10px 0;
-  max-width:82%;
-  font-size:14px;
-  line-height:1.45;
-  white-space:pre-wrap;
-  overflow-wrap:anywhere;
-}
-
+.msg{padding:11px 13px;border-radius:13px;margin:10px 0;max-width:82%;font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
 .bot{background:#1e293b}
 .userMsg{background:#2563eb;margin-left:auto}
-
-.chatInput{
-  margin:12px;
-  padding:12px;
-  border-radius:14px;
-  background:#0f172a;
-  border:1px solid #334155;
-  color:#64748b;
-  display:flex;
-  justify-content:space-between;
-}
-
-.quickGrid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-}
-
-.quickCard{
-  padding:16px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:rgba(15,23,42,.75);
-  cursor:pointer;
-}
-
-.quickCard:hover{
-  background:rgba(37,99,235,.14);
-  border-color:#3b82f6;
-}
-
-.quickIcon{
-  width:38px;
-  height:38px;
-  border-radius:13px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#1d4ed8;
-  margin-bottom:12px;
-}
-
-.quickCard span{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.emptyState{
-  min-height:190px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  color:var(--muted);
-  border-radius:16px;
-  background:rgba(2,6,23,.25);
-}
-
-.emptyState strong{
-  color:white;
-  display:block;
-  margin-bottom:6px;
-}
-
-.pageGrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:20px;
-}
-
-.code{
-  background:#020617;
-  color:#22c55e;
-  padding:16px;
-  border-radius:14px;
-  white-space:pre-wrap;
-  word-break:break-all;
-  border:1px solid #1e293b;
-}
-
-.installSteps{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
-  margin-bottom:20px;
-}
-
-.step{
-  padding:16px;
-  background:#0f172a;
-  border:1px solid var(--border);
-  border-radius:16px;
-}
-
-.stepNumber{
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#2563eb;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-.conversationItem{
-  padding:16px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:#0f172a;
-  margin-bottom:12px;
-  cursor:pointer;
-}
-
-.conversationItem:hover{
-  border-color:#3b82f6;
-  background:rgba(37,99,235,.12);
-}
-
-.liveMessages{
-  height:500px;
-  overflow:auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  padding-right:8px;
-}
-
+.humanMsg{background:#14532d;margin-left:auto;border:1px solid rgba(34,197,94,.3)}
+.chatInput{margin:12px;padding:12px;border-radius:14px;background:#0f172a;border:1px solid #334155;color:#64748b;display:flex;justify-content:space-between}
+.quickGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.quickCard{padding:16px;border:1px solid var(--border);border-radius:16px;background:rgba(15,23,42,.75);cursor:pointer}
+.quickCard:hover{background:rgba(37,99,235,.14);border-color:#3b82f6}
+.quickIcon{width:38px;height:38px;border-radius:13px;display:flex;align-items:center;justify-content:center;background:#1d4ed8;margin-bottom:12px}
+.quickCard span{color:var(--muted);font-size:13px}
+.emptyState{min-height:190px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);border-radius:16px;background:rgba(2,6,23,.25)}
+.emptyState strong{color:white;display:block;margin-bottom:6px}
+.pageGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.code{background:#020617;color:#22c55e;padding:16px;border-radius:14px;white-space:pre-wrap;word-break:break-all;border:1px solid #1e293b}
+.installSteps{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:20px}
+.step{padding:16px;background:#0f172a;border:1px solid var(--border);border-radius:16px}
+.stepNumber{width:30px;height:30px;border-radius:50%;background:#2563eb;display:flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:10px}
+.conversationItem{padding:16px;border:1px solid var(--border);border-radius:14px;background:#0f172a;margin-bottom:12px;cursor:pointer}
+.conversationItem:hover{border-color:#3b82f6;background:rgba(37,99,235,.12)}
+.liveMessages{height:500px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:8px}
 .adminOnly{display:flex}
 body.client .adminOnly{display:none!important}
-
-@media(max-width:1200px){
-  .statsGrid,.quickGrid{grid-template-columns:repeat(2,1fr)}
-  .dashboardGrid,.pageGrid{grid-template-columns:1fr}
-}
-
-@media(max-width:800px){
-  .page{flex-direction:column}
-  .sidebar{width:100%;height:auto;position:relative}
-  .statsGrid,.quickGrid,.installSteps{grid-template-columns:1fr}
-  .main{padding:20px}
-}
+@media(max-width:1200px){.statsGrid,.quickGrid{grid-template-columns:repeat(2,1fr)}.dashboardGrid,.pageGrid{grid-template-columns:1fr}}
+@media(max-width:800px){.page{flex-direction:column}.sidebar{width:100%;height:auto;position:relative}.statsGrid,.quickGrid,.installSteps{grid-template-columns:1fr}.main{padding:20px}}
 </style>
 </head>
 
@@ -515,31 +94,24 @@ body.client .adminOnly{display:none!important}
 <div id="auth" class="auth card">
   <h1>Kiri AI</h1>
   <p>Login or create your account.</p>
-
   <input id="email" placeholder="Email" />
   <input id="password" placeholder="Password" type="password" />
-
   <div class="authActions">
     <button class="primary" onclick="login()">Login</button>
     <button class="green" onclick="register()">Register</button>
   </div>
-
   <p id="authMsg"></p>
 </div>
 
 <div id="app" class="page hidden">
-
   <aside class="sidebar">
     <div>
-      <div class="logo">
-        <div class="logoMark"></div>
-        <span>Kiri AI</span>
-      </div>
+      <div class="logo"><div class="logoMark"></div><span>Kiri AI</span></div>
 
       <nav class="nav">
         <button class="active" data-page="dashboard" onclick="show('dashboard', this)">🏠 Overview</button>
         <button data-page="conversations" onclick="show('conversations', this)">💬 Conversations</button>
-        <button data-page="livechat" onclick="show('livechat', this)">🟢 Live Chat</button>
+        <button data-page="livechat" onclick="show('livechat', this)">🟢 Live Chat <span id="liveBadge" class="navBadge">0</span></button>
         <button data-page="knowledge" onclick="show('knowledge', this)">🧠 Knowledge Base</button>
         <button data-page="settings" onclick="show('settings', this)">⚙️ Widget Settings</button>
         <button data-page="install" onclick="show('install', this)">📥 Install Widget</button>
@@ -559,10 +131,7 @@ body.client .adminOnly{display:none!important}
 
       <div class="profileBox">
         <div class="avatar" id="avatarLetter">K</div>
-        <div>
-          <strong id="profileEmail">Kiri AI User</strong><br>
-          <span id="profilePlan">Free Plan</span>
-        </div>
+        <div><strong id="profileEmail">Kiri AI User</strong><br><span id="profilePlan">Free Plan</span></div>
       </div>
     </div>
   </aside>
@@ -571,57 +140,15 @@ body.client .adminOnly{display:none!important}
 
     <section id="dashboard">
       <div class="topbar">
-        <div>
-          <h1>Welcome back 👋</h1>
-          <p>Here’s what’s happening with your AI assistant today.</p>
-        </div>
+        <div><h1>Welcome back 👋</h1><p>Here’s what’s happening with your AI assistant today.</p></div>
         <div class="badge" id="roleBadge">Client Dashboard</div>
       </div>
 
       <div class="statsGrid">
-        <div class="card stat">
-          <div class="statTop">
-            <div>
-              <h3>Conversations</h3>
-              <div class="statValue" id="statConversations">0</div>
-              <small>-- vs last 7 days</small>
-            </div>
-            <div class="statIcon">💬</div>
-          </div>
-        </div>
-
-        <div class="card stat">
-          <div class="statTop">
-            <div>
-              <h3>Messages</h3>
-              <div class="statValue" id="statMessages">0</div>
-              <small>-- vs last 7 days</small>
-            </div>
-            <div class="statIcon">✉️</div>
-          </div>
-        </div>
-
-        <div class="card stat">
-          <div class="statTop">
-            <div>
-              <h3>Human Takeovers</h3>
-              <div class="statValue" id="statTakeovers">0</div>
-              <small>Active takeover chats</small>
-            </div>
-            <div class="statIcon">👤</div>
-          </div>
-        </div>
-
-        <div class="card stat">
-          <div class="statTop">
-            <div>
-              <h3>Current Plan</h3>
-              <div class="statValue" id="statPlan">Free</div>
-              <small id="planSubtext">Upgrade to unlock more features.</small>
-            </div>
-            <div class="statIcon">⭐</div>
-          </div>
-        </div>
+        <div class="card stat"><div class="statTop"><div><h3>Conversations</h3><div class="statValue" id="statConversations">0</div><small>All customer chats</small></div><div class="statIcon">💬</div></div></div>
+        <div class="card stat"><div class="statTop"><div><h3>Messages</h3><div class="statValue" id="statMessages">0</div><small>Current month usage</small></div><div class="statIcon">✉️</div></div></div>
+        <div class="card stat"><div class="statTop"><div><h3>Human Takeovers</h3><div class="statValue" id="statTakeovers">0</div><small>Active takeover chats</small></div><div class="statIcon">👤</div></div></div>
+        <div class="card stat"><div class="statTop"><div><h3>Current Plan</h3><div class="statValue" id="statPlan">Free</div><small id="planSubtext">Upgrade to unlock more features.</small></div><div class="statIcon">⭐</div></div></div>
       </div>
 
       <div class="dashboardGrid">
@@ -629,7 +156,6 @@ body.client .adminOnly{display:none!important}
           <div class="card">
             <h2>Analytics Overview</h2>
             <div class="fakeChart"></div>
-
             <div class="analyticsStats">
               <div class="smallMetric"><span class="muted">Avg. Response Time</span><strong>--</strong></div>
               <div class="smallMetric"><span class="muted">Resolution Rate</span><strong>--</strong></div>
@@ -657,10 +183,7 @@ body.client .adminOnly{display:none!important}
 
             <div class="preview">
               <div class="chatbox">
-                <div class="chatHead">
-                  <div>Kiri AI<div class="online">Online</div></div>
-                  <div>×</div>
-                </div>
+                <div class="chatHead"><div>Kiri AI<div class="online">Online</div></div><div>×</div></div>
                 <div class="chatBody">
                   <div class="msg bot">Hi! How can I help you today?</div>
                   <div class="msg userMsg">I need help with something.</div>
@@ -676,65 +199,37 @@ body.client .adminOnly{display:none!important}
               <h2 style="margin:0">Recent Conversations</h2>
               <button class="ghost" onclick="show('conversations')">View all</button>
             </div>
-            <div id="recentConversationList" class="emptyState">
-              <div>
-                <strong>No conversations yet</strong>
-                Your conversations will appear here.
-              </div>
-            </div>
+            <div id="recentConversationList" class="emptyState"><div><strong>No conversations yet</strong>Your conversations will appear here.</div></div>
           </div>
         </div>
       </div>
     </section>
 
     <section id="conversations" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Conversations</h1>
-          <p>View chats from your installed AI widget.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <div id="conversationList" class="conversationList"></div>
-      </div>
+      <div class="topbar"><div><h1>Conversations</h1><p>View chats from your installed AI widget.</p></div></div>
+      <div class="card"><div id="conversationList"></div></div>
     </section>
 
     <section id="livechat" class="hidden">
       <div class="topbar">
-        <div>
-          <h1>Live Chat</h1>
-          <p>Manage conversations requiring human takeover.</p>
-        </div>
+        <div><h1>Live Chat</h1><p>Manage conversations requiring human takeover.</p></div>
+        <button class="ghost" onclick="loadLiveChats()">Refresh</button>
       </div>
 
       <div class="pageGrid">
         <div class="card">
           <h2>Takeover Conversations</h2>
-          <div id="liveChatList">
-            <div class="emptyState">
-              <div>
-                <strong>No active takeovers</strong>
-                Human takeover chats will appear here.
-              </div>
-            </div>
-          </div>
+          <div id="liveChatList"><div class="emptyState"><div><strong>No active takeovers</strong>Human takeover chats will appear here.</div></div></div>
         </div>
 
         <div class="card">
           <h2>Conversation</h2>
-
           <div id="liveChatMessages" class="liveMessages">
-            <div class="emptyState" style="height:100%">
-              <div>
-                <strong>No conversation selected</strong>
-                Select a conversation from the left.
-              </div>
-            </div>
+            <div class="emptyState" style="height:100%"><div><strong>No conversation selected</strong>Select a conversation from the left.</div></div>
           </div>
 
           <div style="display:flex;gap:10px;margin-top:15px">
-            <input id="liveReplyInput" placeholder="Type human reply..." />
+            <input id="liveReplyInput" placeholder="Type human reply..." onkeydown="if(event.key==='Enter'){event.preventDefault();sendLiveReply();}" />
             <button class="primary" onclick="sendLiveReply()">Send</button>
             <button class="ghost" onclick="returnToAI()">Return AI</button>
           </div>
@@ -743,102 +238,53 @@ body.client .adminOnly{display:none!important}
     </section>
 
     <section id="knowledge" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Knowledge Base</h1>
-          <p>Train your AI assistant with website content or business information.</p>
-        </div>
-      </div>
-
+      <div class="topbar"><div><h1>Knowledge Base</h1><p>Train your AI assistant with website content or business information.</p></div></div>
       <div class="pageGrid">
-        <div class="card">
-          <h2>Add Website</h2>
-          <input id="knowledgeUrl" placeholder="https://example.com" />
-          <button class="primary">Scrape Website</button>
-        </div>
-
-        <div class="card">
-          <h2>Manual Instructions</h2>
-          <textarea rows="8" placeholder="Example: We ship in 2-4 working days..."></textarea>
-          <button class="primary">Save Knowledge</button>
-        </div>
+        <div class="card"><h2>Add Website</h2><input id="knowledgeUrl" placeholder="https://example.com" /><button class="primary">Scrape Website</button></div>
+        <div class="card"><h2>Manual Instructions</h2><textarea rows="8" placeholder="Example: We ship in 2-4 working days..."></textarea><button class="primary">Save Knowledge</button></div>
       </div>
     </section>
 
     <section id="settings" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Widget Settings</h1>
-          <p>Customize how your AI assistant looks and behaves.</p>
-        </div>
-      </div>
-
+      <div class="topbar"><div><h1>Widget Settings</h1><p>Customize how your AI assistant looks and behaves.</p></div></div>
       <div class="pageGrid">
         <div class="card">
           <h2>Business Settings</h2>
-          <label>Company name</label>
-          <input placeholder="Example: Kiri AI" />
-          <label>Website</label>
-          <input placeholder="example.com" />
-          <label>Bot instructions</label>
-          <textarea rows="6" placeholder="Tell the bot how to behave..."></textarea>
+          <label>Company name</label><input placeholder="Example: Kiri AI" />
+          <label>Website</label><input placeholder="example.com" />
+          <label>Bot instructions</label><textarea rows="6" placeholder="Tell the bot how to behave..."></textarea>
           <button class="primary">Save Settings</button>
         </div>
-
         <div class="card">
           <h2>Appearance</h2>
-          <label>Widget title</label>
-          <input placeholder="Kiri AI" />
-          <label>Primary color</label>
-          <input placeholder="#2563eb" />
-          <label>Welcome message</label>
-          <input placeholder="Hi! How can I help you?" />
+          <label>Widget title</label><input placeholder="Kiri AI" />
+          <label>Primary color</label><input placeholder="#2563eb" />
+          <label>Welcome message</label><input placeholder="Hi! How can I help you?" />
           <button class="primary">Save Appearance</button>
         </div>
       </div>
     </section>
 
     <section id="install" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Install Widget</h1>
-          <p>Copy your installation script and paste it before the closing body tag.</p>
-        </div>
-      </div>
-
+      <div class="topbar"><div><h1>Install Widget</h1><p>Copy your installation script and paste it before the closing body tag.</p></div></div>
       <div class="installSteps">
         <div class="step"><div class="stepNumber">1</div><strong>Copy script</strong><p class="muted">Use the script generated for your site.</p></div>
         <div class="step"><div class="stepNumber">2</div><strong>Paste before &lt;/body&gt;</strong><p class="muted">Add it to your website HTML.</p></div>
         <div class="step"><div class="stepNumber">3</div><strong>Go live</strong><p class="muted">Your AI widget appears on your site.</p></div>
       </div>
-
       <div class="card">
-        <h2>Your site key</h2>
-        <div class="code" id="siteKeyBox"></div>
-
+        <h2>Your site key</h2><div class="code" id="siteKeyBox"></div>
         <div style="height:18px"></div>
-
-        <h2>Paste this before &lt;/body&gt;</h2>
-        <div class="code" id="embedBox"></div>
-
-        <div style="margin-top:15px">
-          <button class="primary" onclick="copyEmbed()">Copy Install Code</button>
-        </div>
+        <h2>Paste this before &lt;/body&gt;</h2><div class="code" id="embedBox"></div>
+        <div style="margin-top:15px"><button class="primary" onclick="copyEmbed()">Copy Install Code</button></div>
       </div>
     </section>
 
     <section id="analytics" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Analytics</h1>
-          <p>Track conversations, messages and assistant performance.</p>
-        </div>
-      </div>
-
+      <div class="topbar"><div><h1>Analytics</h1><p>Track conversations, messages and assistant performance.</p></div></div>
       <div class="card">
         <h2>Usage Analytics</h2>
         <div class="fakeChart"></div>
-
         <div class="analyticsStats">
           <div class="smallMetric"><span class="muted">Total Conversations</span><strong id="analyticsConversations">0</strong></div>
           <div class="smallMetric"><span class="muted">Total Messages</span><strong id="analyticsMessages">0</strong></div>
@@ -848,40 +294,16 @@ body.client .adminOnly{display:none!important}
     </section>
 
     <section id="pricing" class="hidden">
-      <div class="topbar">
-        <div>
-          <h1>Billing</h1>
-          <p>Manage your plan and upgrade when you are ready.</p>
-        </div>
-      </div>
-
+      <div class="topbar"><div><h1>Billing</h1><p>Manage your plan and upgrade when you are ready.</p></div></div>
       <div class="pageGrid">
-        <div class="card">
-          <h2 id="billingCurrentPlan">Free Plan</h2>
-          <p class="muted" id="billingPlanText">Basic chatbot access for testing.</p>
-          <button class="ghost" id="billingCurrentBtn">Current Plan</button>
-        </div>
-
-        <div class="card">
-          <h2>Pro Plan</h2>
-          <p class="muted">$19.99 / month — unlock full chatbot access.</p>
-          <button class="primary" id="proBuyBtn" onclick="buy()">Buy Pro</button>
-        </div>
+        <div class="card"><h2 id="billingCurrentPlan">Free Plan</h2><p class="muted" id="billingPlanText">Basic chatbot access for testing.</p><button class="ghost" id="billingCurrentBtn">Current Plan</button></div>
+        <div class="card"><h2>Pro Plan</h2><p class="muted">$19.99 / month — unlock full chatbot access.</p><button class="primary" id="proBuyBtn" onclick="buy()">Buy Pro</button></div>
       </div>
     </section>
 
     <section id="admin" class="hidden adminOnly">
-      <div class="topbar">
-        <div>
-          <h1>Admin Panel 👑</h1>
-          <p>Internal Kiri AI overview. Clients should not see this.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Admin Notes</h2>
-        <p class="muted">Admin tools will go here after backend cleanup.</p>
-      </div>
+      <div class="topbar"><div><h1>Admin Panel 👑</h1><p>Internal Kiri AI overview. Clients should not see this.</p></div></div>
+      <div class="card"><h2>Admin Notes</h2><p class="muted">Admin tools will go here after backend cleanup.</p></div>
     </section>
 
   </main>
@@ -892,12 +314,20 @@ const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let user = null;
 let currentLiveConversation = null;
+let liveRefreshTimer = null;
+let dashboardRefreshStarted = false;
 
-try {
-  user = JSON.parse(localStorage.getItem("user"));
-} catch(e){}
+try{user = JSON.parse(localStorage.getItem("user"));}catch(e){}
+if(user) startApp();
 
-if (user) startApp();
+function escapeHTML(str){
+  return String(str || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
 function startApp(){
   document.getElementById("auth").classList.add("hidden");
@@ -905,10 +335,10 @@ function startApp(){
 
   document.body.classList.remove("admin","client");
 
-  if (user.role === "admin") {
+  if(user.role === "admin"){
     document.body.classList.add("admin");
     document.getElementById("roleBadge").innerText = "Admin Dashboard";
-  } else {
+  }else{
     document.body.classList.add("client");
     document.getElementById("roleBadge").innerText = "Client Dashboard";
   }
@@ -927,113 +357,111 @@ function startApp(){
 `<script src="https://kiri-backend-prod-production.up.railway.app/widget.js" data-site-key="${siteKey}"><\/script>`;
 
   loadDashboardData();
+
+  if(!dashboardRefreshStarted){
+    dashboardRefreshStarted = true;
+    setInterval(loadDashboardData, 8000);
+  }
 }
 
 function show(id, btn){
   const pages = ["dashboard","conversations","livechat","knowledge","settings","install","analytics","pricing","admin"];
 
   pages.forEach(x=>{
-    const el = document.getElementById(x);
+    const el=document.getElementById(x);
     if(el) el.classList.add("hidden");
   });
 
-  const target = document.getElementById(id);
+  const target=document.getElementById(id);
   if(target) target.classList.remove("hidden");
 
   document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
 
-  if(btn){
-    btn.classList.add("active");
-  } else {
-    const found = document.querySelector(`.nav button[data-page="${id}"]`);
+  if(btn) btn.classList.add("active");
+  else{
+    const found=document.querySelector(`.nav button[data-page="${id}"]`);
     if(found) found.classList.add("active");
   }
+
+  if(id !== "livechat") stopLiveRefresh();
 
   if(id === "conversations") loadConversations();
   if(id === "livechat") loadLiveChats();
 }
 
 async function register(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value.trim();
 
   if(!email || !password){
-    document.getElementById("authMsg").innerText = "Enter email and password";
+    document.getElementById("authMsg").innerText="Enter email and password";
     return;
   }
 
-  const res = await fetch(API + "/register", {
+  const res=await fetch(API+"/register",{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email, password })
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
   });
 
-  const data = await res.json();
+  const data=await res.json();
 
   if(!data.site_key){
-    document.getElementById("authMsg").innerText = "Register failed";
+    document.getElementById("authMsg").innerText="Register failed";
     return;
   }
 
-  user = {
-    id:data.id,
-    email:data.email || email,
-    role:data.role || "user",
-    site_key:data.site_key,
-    plan:"Free"
-  };
-
-  localStorage.setItem("user", JSON.stringify(user));
+  user={id:data.id,email:data.email || email,role:data.role || "user",site_key:data.site_key,plan:"Free"};
+  localStorage.setItem("user",JSON.stringify(user));
   startApp();
 }
 
 async function login(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email=document.getElementById("email").value.trim();
+  const password=document.getElementById("password").value.trim();
 
   if(!email || !password){
-    document.getElementById("authMsg").innerText = "Enter email and password";
+    document.getElementById("authMsg").innerText="Enter email and password";
     return;
   }
 
-  const res = await fetch(API + "/login", {
+  const res=await fetch(API+"/login",{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email, password })
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({email,password})
   });
 
-  const data = await res.json();
+  const data=await res.json();
 
   if(!data.success){
-    document.getElementById("authMsg").innerText = "Wrong login";
+    document.getElementById("authMsg").innerText="Wrong login";
     return;
   }
 
-  user = data;
-  localStorage.setItem("user", JSON.stringify(user));
+  user=data;
+  localStorage.setItem("user",JSON.stringify(user));
   startApp();
 }
 
 async function buy(){
-  const res = await fetch(API + "/create-checkout", {
+  const res=await fetch(API+"/create-checkout",{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ site_key:user.site_key })
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({site_key:user.site_key})
   });
 
-  const data = await res.json();
+  const data=await res.json();
 
   if(!data.url){
     alert("Stripe error");
     return;
   }
 
-  window.location.href = data.url;
+  window.location.href=data.url;
 }
 
 function copyEmbed(){
-  const code = document.getElementById("embedBox").innerText;
-  navigator.clipboard.writeText(code);
+  navigator.clipboard.writeText(document.getElementById("embedBox").innerText);
   alert("Install code copied!");
 }
 
@@ -1043,108 +471,111 @@ function logout(){
 }
 
 async function loadDashboardData(){
+  if(!user || !user.site_key) return;
+
   try{
-    const usageRes = await fetch(API + "/site-usage", {
+    const usageRes=await fetch(API+"/site-usage",{
       method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ siteKey:user.site_key })
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({siteKey:user.site_key})
     });
 
-    const usage = await usageRes.json();
+    const usage=await usageRes.json();
 
     if(usage.plan){
-      const cleanPlan = usage.plan.toLowerCase();
-      const displayPlan = cleanPlan.charAt(0).toUpperCase() + cleanPlan.slice(1);
+      const cleanPlan=usage.plan.toLowerCase();
+      const displayPlan=cleanPlan.charAt(0).toUpperCase()+cleanPlan.slice(1);
 
-      document.getElementById("statPlan").innerText = displayPlan;
-      document.getElementById("profilePlan").innerText = displayPlan + " Plan";
-      document.getElementById("billingCurrentPlan").innerText = displayPlan + " Plan";
+      document.getElementById("statPlan").innerText=displayPlan;
+      document.getElementById("profilePlan").innerText=displayPlan+" Plan";
+      document.getElementById("billingCurrentPlan").innerText=displayPlan+" Plan";
 
-      if(cleanPlan === "pro"){
-        document.getElementById("planSubtext").innerText = "You are currently on Pro.";
-        document.getElementById("billingPlanText").innerText = "You are currently on the Pro plan.";
-        document.getElementById("proBuyBtn").innerText = "Already on Pro";
-        document.getElementById("proBuyBtn").disabled = true;
-        document.getElementById("upgradeBox").style.display = "none";
-      } else {
-        document.getElementById("planSubtext").innerText = "Upgrade to unlock more features.";
-        document.getElementById("billingPlanText").innerText = "Basic chatbot access for testing.";
-        document.getElementById("proBuyBtn").innerText = "Buy Pro";
-        document.getElementById("proBuyBtn").disabled = false;
+      if(cleanPlan==="pro"){
+        document.getElementById("planSubtext").innerText="You are currently on Pro.";
+        document.getElementById("billingPlanText").innerText="You are currently on the Pro plan.";
+        document.getElementById("proBuyBtn").innerText="Already on Pro";
+        document.getElementById("proBuyBtn").disabled=true;
+        document.getElementById("upgradeBox").style.display="none";
+      }else{
+        document.getElementById("planSubtext").innerText="Upgrade to unlock more features.";
+        document.getElementById("billingPlanText").innerText="Basic chatbot access for testing.";
+        document.getElementById("proBuyBtn").innerText="Buy Pro";
+        document.getElementById("proBuyBtn").disabled=false;
+        document.getElementById("upgradeBox").style.display="block";
       }
     }
 
     if(usage.monthlyUsed !== undefined){
-      document.getElementById("statMessages").innerText = usage.monthlyUsed;
-      document.getElementById("analyticsMessages").innerText = usage.monthlyUsed;
+      document.getElementById("statMessages").innerText=usage.monthlyUsed;
+      document.getElementById("analyticsMessages").innerText=usage.monthlyUsed;
     }
 
-    const convRes = await fetch(API + "/conversations?site_key=" + user.site_key);
-    const conversations = await convRes.json();
+    const convRes=await fetch(API+"/conversations?site_key="+encodeURIComponent(user.site_key));
+    const conversations=await convRes.json();
 
     if(Array.isArray(conversations)){
-      document.getElementById("statConversations").innerText = conversations.length;
-      document.getElementById("analyticsConversations").innerText = conversations.length;
+      document.getElementById("statConversations").innerText=conversations.length;
+      document.getElementById("analyticsConversations").innerText=conversations.length;
 
-      const activeTakeovers = conversations.filter(c => c.human_takeover).length;
-      document.getElementById("statTakeovers").innerText = activeTakeovers;
-      document.getElementById("analyticsTakeovers").innerText = activeTakeovers;
+      const activeTakeovers=conversations.filter(c=>c.human_takeover).length;
+      document.getElementById("statTakeovers").innerText=activeTakeovers;
+      document.getElementById("analyticsTakeovers").innerText=activeTakeovers;
 
+      updateLiveBadge(activeTakeovers);
       renderRecentConversations(conversations);
     }
 
   }catch(err){
-    console.log("Dashboard stats not loaded yet", err);
+    console.log("Dashboard stats not loaded yet",err);
   }
 }
 
+function updateLiveBadge(count){
+  const badge=document.getElementById("liveBadge");
+  if(!badge) return;
+
+  badge.innerText=count;
+
+  if(count > 0) badge.classList.add("show");
+  else badge.classList.remove("show");
+}
+
 function renderRecentConversations(conversations){
-  const box = document.getElementById("recentConversationList");
+  const box=document.getElementById("recentConversationList");
   if(!box) return;
 
-  if(!Array.isArray(conversations) || conversations.length === 0){
-    box.className = "emptyState";
-    box.innerHTML = `
-      <div>
-        <strong>No conversations yet</strong>
-        Your conversations will appear here.
-      </div>
-    `;
+  if(!Array.isArray(conversations) || conversations.length===0){
+    box.className="emptyState";
+    box.innerHTML=`<div><strong>No conversations yet</strong>Your conversations will appear here.</div>`;
     return;
   }
 
-  box.className = "";
-  box.innerHTML = conversations.slice(0,3).map(c => `
+  box.className="";
+  box.innerHTML=conversations.slice(0,3).map(c=>`
     <div class="conversationItem" onclick="openConversation('${c.id}')">
       <strong>Conversation #${c.id}</strong>
       <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
+      ${c.human_takeover ? `<p style="color:#22c55e;font-weight:800">Human takeover active</p>` : ``}
     </div>
   `).join("");
 }
 
 async function loadConversations(){
-  const box = document.getElementById("conversationList");
+  const box=document.getElementById("conversationList");
   if(!box) return;
 
-  box.innerHTML = `<p class="muted">Loading conversations...</p>`;
+  box.innerHTML=`<p class="muted">Loading conversations...</p>`;
 
   try{
-    const res = await fetch(API + "/conversations?site_key=" + user.site_key);
-    const conversations = await res.json();
+    const res=await fetch(API+"/conversations?site_key="+encodeURIComponent(user.site_key));
+    const conversations=await res.json();
 
-    if(!Array.isArray(conversations) || conversations.length === 0){
-      box.innerHTML = `
-        <div class="emptyState">
-          <div>
-            <strong>No conversations yet</strong>
-            Once people use your widget, chats will appear here.
-          </div>
-        </div>
-      `;
+    if(!Array.isArray(conversations) || conversations.length===0){
+      box.innerHTML=`<div class="emptyState"><div><strong>No conversations yet</strong>Once people use your widget, chats will appear here.</div></div>`;
       return;
     }
 
-    box.innerHTML = conversations.map(c => `
+    box.innerHTML=conversations.map(c=>`
       <div class="conversationItem" onclick="openConversation('${c.id}')">
         <strong>Conversation #${c.id}</strong>
         <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
@@ -1154,134 +585,158 @@ async function loadConversations(){
 
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Could not load conversations.</p>`;
+    box.innerHTML=`<p class="muted">Could not load conversations.</p>`;
   }
 }
 
 async function openConversation(id){
-  const box = document.getElementById("conversationList");
-
-  box.innerHTML = `<p class="muted">Loading messages...</p>`;
+  const box=document.getElementById("conversationList");
+  box.innerHTML=`<p class="muted">Loading messages...</p>`;
 
   try{
-    const res = await fetch(API + "/admin/messages/" + id);
-    const messages = await res.json();
+    const res=await fetch(API+"/admin/messages/"+id);
+    const messages=await res.json();
 
-    box.innerHTML = `
+    box.innerHTML=`
       <button class="ghost" onclick="loadConversations()">← Back</button>
       <div style="height:15px"></div>
-      ${messages.map(m => `
-        <div class="msg ${m.role === "user" ? "userMsg" : "bot"}" style="margin-bottom:10px">
-          <strong>${m.role}</strong><br>
-          ${m.content}
-        </div>
-      `).join("")}
+      ${messages.map(m=>messageHTML(m)).join("")}
     `;
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Could not load messages.</p>`;
+    box.innerHTML=`<p class="muted">Could not load messages.</p>`;
   }
 }
 
+function messageHTML(m){
+  let cls="bot";
+  if(m.role==="user") cls="userMsg";
+  if(m.role==="human") cls="humanMsg";
+
+  return `
+    <div class="msg ${cls}" style="margin-bottom:10px">
+      <strong>${escapeHTML(m.role)}</strong><br>
+      ${escapeHTML(m.content)}
+    </div>
+  `;
+}
+
 async function loadLiveChats(){
-  const box = document.getElementById("liveChatList");
-  box.innerHTML = `<p class="muted">Loading...</p>`;
+  const box=document.getElementById("liveChatList");
+  box.innerHTML=`<p class="muted">Loading...</p>`;
 
   try{
-    const res = await fetch(API + "/conversations?site_key=" + user.site_key);
-    const conversations = await res.json();
+    const res=await fetch(API+"/conversations?site_key="+encodeURIComponent(user.site_key));
+    const conversations=await res.json();
 
-    const filtered = Array.isArray(conversations)
-      ? conversations.filter(c => c.human_takeover)
-      : [];
+    const filtered=Array.isArray(conversations) ? conversations.filter(c=>c.human_takeover) : [];
 
-    if(filtered.length === 0){
-      box.innerHTML = `
-        <div class="emptyState">
-          <div>
-            <strong>No active takeovers</strong>
-            Human takeover chats will appear here.
-          </div>
-        </div>
-      `;
+    updateLiveBadge(filtered.length);
+    document.getElementById("statTakeovers").innerText=filtered.length;
+    document.getElementById("analyticsTakeovers").innerText=filtered.length;
+
+    if(filtered.length===0){
+      box.innerHTML=`<div class="emptyState"><div><strong>No active takeovers</strong>Human takeover chats will appear here.</div></div>`;
       return;
     }
 
-    box.innerHTML = filtered.map(c => `
+    box.innerHTML=filtered.map(c=>`
       <div class="conversationItem" onclick="openLiveConversation('${c.id}')">
         <strong>Conversation #${c.id}</strong>
         <p class="muted">Human takeover active</p>
+        <p style="color:#22c55e;font-weight:800">Needs human reply</p>
       </div>
     `).join("");
 
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Failed loading chats.</p>`;
+    box.innerHTML=`<p class="muted">Failed loading chats.</p>`;
+  }
+}
+
+function stopLiveRefresh(){
+  if(liveRefreshTimer){
+    clearInterval(liveRefreshTimer);
+    liveRefreshTimer=null;
   }
 }
 
 async function openLiveConversation(id){
-  currentLiveConversation = id;
+  currentLiveConversation=id;
+  await refreshLiveConversation();
 
-  const box = document.getElementById("liveChatMessages");
-  box.innerHTML = `<p class="muted">Loading messages...</p>`;
+  stopLiveRefresh();
+  liveRefreshTimer=setInterval(refreshLiveConversation,2000);
+
+  const input=document.getElementById("liveReplyInput");
+  if(input) input.focus();
+}
+
+async function refreshLiveConversation(){
+  if(!currentLiveConversation) return;
+
+  const box=document.getElementById("liveChatMessages");
 
   try{
-    const res = await fetch(API + "/admin/messages/" + id);
-    const messages = await res.json();
+    const res=await fetch(API+"/admin/messages/"+currentLiveConversation);
+    const messages=await res.json();
 
-    box.innerHTML = messages.map(m => `
-      <div class="msg ${m.role === "user" ? "userMsg" : "bot"}">
-        <strong>${m.role}</strong><br>
-        ${m.content}
-      </div>
-    `).join("");
+    if(!Array.isArray(messages)){
+      box.innerHTML=`<p class="muted">Could not load messages.</p>`;
+      return;
+    }
 
-    box.scrollTop = box.scrollHeight;
+    const oldScroll=box.scrollTop;
+    const wasNearBottom=box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+
+    box.innerHTML=messages.map(m=>messageHTML(m)).join("");
+
+    if(wasNearBottom) box.scrollTop=box.scrollHeight;
+    else box.scrollTop=oldScroll;
 
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Could not load messages.</p>`;
   }
 }
 
 async function sendLiveReply(){
   if(!currentLiveConversation) return;
 
-  const input = document.getElementById("liveReplyInput");
-  const message = input.value.trim();
-
+  const input=document.getElementById("liveReplyInput");
+  const message=input.value.trim();
   if(!message) return;
 
-  await fetch(API + "/admin/reply", {
+  input.value="";
+
+  await fetch(API+"/admin/reply",{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      conversationId: currentLiveConversation,
+      conversationId:currentLiveConversation,
       message
     })
   });
 
-  input.value = "";
-  openLiveConversation(currentLiveConversation);
+  await refreshLiveConversation();
 }
 
 async function returnToAI(){
   if(!currentLiveConversation) return;
 
-  await fetch(API + "/admin/return-to-ai", {
+  await fetch(API+"/admin/return-to-ai",{
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      conversationId: currentLiveConversation
+      conversationId:currentLiveConversation
     })
   });
 
-  currentLiveConversation = null;
+  currentLiveConversation=null;
+  stopLiveRefresh();
   loadLiveChats();
   loadDashboardData();
 
-  document.getElementById("liveChatMessages").innerHTML = `
+  document.getElementById("liveChatMessages").innerHTML=`
     <div class="emptyState" style="height:100%">
       <div>
         <strong>Returned to AI</strong>
