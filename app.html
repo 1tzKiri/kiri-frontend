@@ -30,7 +30,6 @@ body{
 }
 
 .hidden{display:none!important}
-
 button,input,textarea{font-family:inherit}
 
 .page{display:flex;min-height:100vh}
@@ -43,7 +42,6 @@ button,input,textarea{font-family:inherit}
 
 .auth h1{margin:0 0 8px;font-size:32px}
 .auth p{color:var(--muted)}
-
 .authActions{display:flex;gap:10px;margin-top:12px}
 
 input,textarea{
@@ -265,14 +263,6 @@ button:disabled{
   font-size:20px;
 }
 
-.miniLine{
-  position:absolute;
-  right:20px;
-  bottom:23px;
-  width:90px;
-  height:36px;
-}
-
 .dashboardGrid{
   display:grid;
   grid-template-columns:1.15fr .85fr;
@@ -367,6 +357,9 @@ button:disabled{
   margin:10px 0;
   max-width:82%;
   font-size:14px;
+  line-height:1.45;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
 }
 
 .bot{background:#1e293b}
@@ -491,6 +484,15 @@ button:disabled{
   background:rgba(37,99,235,.12);
 }
 
+.liveMessages{
+  height:500px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-right:8px;
+}
+
 .adminOnly{display:flex}
 body.client .adminOnly{display:none!important}
 
@@ -537,6 +539,7 @@ body.client .adminOnly{display:none!important}
       <nav class="nav">
         <button class="active" data-page="dashboard" onclick="show('dashboard', this)">🏠 Overview</button>
         <button data-page="conversations" onclick="show('conversations', this)">💬 Conversations</button>
+        <button data-page="livechat" onclick="show('livechat', this)">🟢 Live Chat</button>
         <button data-page="knowledge" onclick="show('knowledge', this)">🧠 Knowledge Base</button>
         <button data-page="settings" onclick="show('settings', this)">⚙️ Widget Settings</button>
         <button data-page="install" onclick="show('install', this)">📥 Install Widget</button>
@@ -603,7 +606,7 @@ body.client .adminOnly{display:none!important}
             <div>
               <h3>Human Takeovers</h3>
               <div class="statValue" id="statTakeovers">0</div>
-              <small>-- vs last 7 days</small>
+              <small>Active takeover chats</small>
             </div>
             <div class="statIcon">👤</div>
           </div>
@@ -640,7 +643,7 @@ body.client .adminOnly{display:none!important}
               <div class="quickCard" onclick="show('knowledge')"><div class="quickIcon">🧠</div><strong>Train Knowledge</strong><br><span>Add website or content</span></div>
               <div class="quickCard" onclick="show('settings')"><div class="quickIcon">🎨</div><strong>Customize Widget</strong><br><span>Change appearance</span></div>
               <div class="quickCard" onclick="show('install')"><div class="quickIcon">📥</div><strong>Install Widget</strong><br><span>Get installation code</span></div>
-              <div class="quickCard" onclick="show('conversations')"><div class="quickIcon">💬</div><strong>View Conversations</strong><br><span>See all chats</span></div>
+              <div class="quickCard" onclick="show('livechat')"><div class="quickIcon">🟢</div><strong>Live Chat</strong><br><span>Handle takeovers</span></div>
             </div>
           </div>
         </div>
@@ -693,12 +696,47 @@ body.client .adminOnly{display:none!important}
       </div>
 
       <div class="card">
-        <div id="conversationList" class="conversationList">
-          <div class="emptyState">
-            <div>
-              <strong>No conversations yet</strong>
-              Once people use your widget, chats will appear here.
+        <div id="conversationList" class="conversationList"></div>
+      </div>
+    </section>
+
+    <section id="livechat" class="hidden">
+      <div class="topbar">
+        <div>
+          <h1>Live Chat</h1>
+          <p>Manage conversations requiring human takeover.</p>
+        </div>
+      </div>
+
+      <div class="pageGrid">
+        <div class="card">
+          <h2>Takeover Conversations</h2>
+          <div id="liveChatList">
+            <div class="emptyState">
+              <div>
+                <strong>No active takeovers</strong>
+                Human takeover chats will appear here.
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Conversation</h2>
+
+          <div id="liveChatMessages" class="liveMessages">
+            <div class="emptyState" style="height:100%">
+              <div>
+                <strong>No conversation selected</strong>
+                Select a conversation from the left.
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:15px">
+            <input id="liveReplyInput" placeholder="Type human reply..." />
+            <button class="primary" onclick="sendLiveReply()">Send</button>
+            <button class="ghost" onclick="returnToAI()">Return AI</button>
           </div>
         </div>
       </div>
@@ -853,6 +891,7 @@ body.client .adminOnly{display:none!important}
 const API = "https://kiri-backend-prod-production.up.railway.app";
 
 let user = null;
+let currentLiveConversation = null;
 
 try {
   user = JSON.parse(localStorage.getItem("user"));
@@ -891,7 +930,7 @@ function startApp(){
 }
 
 function show(id, btn){
-  const pages = ["dashboard","conversations","knowledge","settings","install","analytics","pricing","admin"];
+  const pages = ["dashboard","conversations","livechat","knowledge","settings","install","analytics","pricing","admin"];
 
   pages.forEach(x=>{
     const el = document.getElementById(x);
@@ -910,9 +949,8 @@ function show(id, btn){
     if(found) found.classList.add("active");
   }
 
-  if(id === "conversations"){
-    loadConversations();
-  }
+  if(id === "conversations") loadConversations();
+  if(id === "livechat") loadLiveChats();
 }
 
 async function register(){
@@ -1048,6 +1086,10 @@ async function loadDashboardData(){
       document.getElementById("statConversations").innerText = conversations.length;
       document.getElementById("analyticsConversations").innerText = conversations.length;
 
+      const activeTakeovers = conversations.filter(c => c.human_takeover).length;
+      document.getElementById("statTakeovers").innerText = activeTakeovers;
+      document.getElementById("analyticsTakeovers").innerText = activeTakeovers;
+
       renderRecentConversations(conversations);
     }
 
@@ -1073,7 +1115,7 @@ function renderRecentConversations(conversations){
 
   box.className = "";
   box.innerHTML = conversations.slice(0,3).map(c => `
-    <div class="conversationItem">
+    <div class="conversationItem" onclick="openConversation('${c.id}')">
       <strong>Conversation #${c.id}</strong>
       <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
     </div>
@@ -1103,9 +1145,10 @@ async function loadConversations(){
     }
 
     box.innerHTML = conversations.map(c => `
-  <div class="conversationItem" onclick="openConversation('${c.id}')">
+      <div class="conversationItem" onclick="openConversation('${c.id}')">
         <strong>Conversation #${c.id}</strong>
         <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
+        ${c.human_takeover ? `<p style="color:#22c55e;font-weight:800">Human takeover active</p>` : ``}
       </div>
     `).join("");
 
@@ -1115,23 +1158,136 @@ async function loadConversations(){
   }
 }
 
-  async function openConversation(id){
+async function openConversation(id){
   const box = document.getElementById("conversationList");
 
   box.innerHTML = `<p class="muted">Loading messages...</p>`;
 
-  const res = await fetch(API + "/admin/messages/" + id);
-  const messages = await res.json();
+  try{
+    const res = await fetch(API + "/admin/messages/" + id);
+    const messages = await res.json();
 
-  box.innerHTML = `
-    <button class="ghost" onclick="loadConversations()">← Back</button>
-    <div style="height:15px"></div>
-    ${messages.map(m => `
-      <div class="msg ${m.role === "user" ? "userMsg" : "bot"}" style="margin-bottom:10px">
+    box.innerHTML = `
+      <button class="ghost" onclick="loadConversations()">← Back</button>
+      <div style="height:15px"></div>
+      ${messages.map(m => `
+        <div class="msg ${m.role === "user" ? "userMsg" : "bot"}" style="margin-bottom:10px">
+          <strong>${m.role}</strong><br>
+          ${m.content}
+        </div>
+      `).join("")}
+    `;
+  }catch(err){
+    console.log(err);
+    box.innerHTML = `<p class="muted">Could not load messages.</p>`;
+  }
+}
+
+async function loadLiveChats(){
+  const box = document.getElementById("liveChatList");
+  box.innerHTML = `<p class="muted">Loading...</p>`;
+
+  try{
+    const res = await fetch(API + "/conversations?site_key=" + user.site_key);
+    const conversations = await res.json();
+
+    const filtered = Array.isArray(conversations)
+      ? conversations.filter(c => c.human_takeover)
+      : [];
+
+    if(filtered.length === 0){
+      box.innerHTML = `
+        <div class="emptyState">
+          <div>
+            <strong>No active takeovers</strong>
+            Human takeover chats will appear here.
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    box.innerHTML = filtered.map(c => `
+      <div class="conversationItem" onclick="openLiveConversation('${c.id}')">
+        <strong>Conversation #${c.id}</strong>
+        <p class="muted">Human takeover active</p>
+      </div>
+    `).join("");
+
+  }catch(err){
+    console.log(err);
+    box.innerHTML = `<p class="muted">Failed loading chats.</p>`;
+  }
+}
+
+async function openLiveConversation(id){
+  currentLiveConversation = id;
+
+  const box = document.getElementById("liveChatMessages");
+  box.innerHTML = `<p class="muted">Loading messages...</p>`;
+
+  try{
+    const res = await fetch(API + "/admin/messages/" + id);
+    const messages = await res.json();
+
+    box.innerHTML = messages.map(m => `
+      <div class="msg ${m.role === "user" ? "userMsg" : "bot"}">
         <strong>${m.role}</strong><br>
         ${m.content}
       </div>
-    `).join("")}
+    `).join("");
+
+    box.scrollTop = box.scrollHeight;
+
+  }catch(err){
+    console.log(err);
+    box.innerHTML = `<p class="muted">Could not load messages.</p>`;
+  }
+}
+
+async function sendLiveReply(){
+  if(!currentLiveConversation) return;
+
+  const input = document.getElementById("liveReplyInput");
+  const message = input.value.trim();
+
+  if(!message) return;
+
+  await fetch(API + "/admin/reply", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      conversationId: currentLiveConversation,
+      message
+    })
+  });
+
+  input.value = "";
+  openLiveConversation(currentLiveConversation);
+}
+
+async function returnToAI(){
+  if(!currentLiveConversation) return;
+
+  await fetch(API + "/admin/return-to-ai", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      conversationId: currentLiveConversation
+    })
+  });
+
+  currentLiveConversation = null;
+  loadLiveChats();
+  loadDashboardData();
+
+  document.getElementById("liveChatMessages").innerHTML = `
+    <div class="emptyState" style="height:100%">
+      <div>
+        <strong>Returned to AI</strong>
+        The assistant is now active again.
+      </div>
+    </div>
   `;
 }
 </script>
