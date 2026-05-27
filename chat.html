@@ -6,9 +6,7 @@
 <title>Kiri AI Widget</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 :root{
   --bg:#0b1020;
@@ -23,8 +21,7 @@
   --red:#ef4444;
 }
 
-html,
-body{
+html,body{
   margin:0;
   width:100%;
   height:100%;
@@ -163,6 +160,14 @@ body{
   border-bottom-left-radius:6px;
 }
 
+.human{
+  align-self:flex-start;
+  background:rgba(20,83,45,.9);
+  color:#dcfce7;
+  border:1px solid rgba(34,197,94,.25);
+  border-bottom-left-radius:6px;
+}
+
 .welcome{
   background:rgba(15,23,42,.92);
   color:#e5e7eb;
@@ -279,7 +284,7 @@ body{
   </div>
 
   <div id="messages">
-    <div class="msg bot welcome">Hi! How can I help you today?</div>
+    <div class="msg bot welcome" id="welcomeMessage">Hi! How can I help you today?</div>
   </div>
 
   <div id="inputBar">
@@ -298,8 +303,11 @@ const SITE_KEY =
   new URLSearchParams(window.location.search).get("site_key") ||
   new URLSearchParams(window.location.search).get("siteKey");
 
+const USER_LANG = navigator.language || navigator.userLanguage || "en";
+
 let conversationId = sessionStorage.getItem("kiri_conversation_" + SITE_KEY);
 let sending = false;
+let knownMessageIds = new Set();
 
 const input = document.getElementById("input");
 const messages = document.getElementById("messages");
@@ -319,7 +327,7 @@ input.addEventListener("keydown", (event) => {
 });
 
 function escapeHTML(str){
-  return String(str)
+  return String(str || "")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
@@ -329,8 +337,16 @@ function escapeHTML(str){
 
 function addMessage(role, text){
   const div = document.createElement("div");
-  div.className = "msg " + role;
+
+  let className = "msg bot";
+  if(role === "user") className = "msg user";
+  if(role === "human") className = "msg human";
+  if(role === "assistant") className = "msg bot";
+  if(role === "bot") className = "msg bot";
+
+  div.className = className;
   div.innerHTML = escapeHTML(text);
+
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
 }
@@ -349,6 +365,15 @@ function removeTyping(){
   if(typing) typing.remove();
 }
 
+function rememberTemporaryMessage(role, content){
+  const tempKey = role + ":" + content;
+  knownMessageIds.add(tempKey);
+}
+
+function isKnownTemp(role, content){
+  return knownMessageIds.has(role + ":" + content);
+}
+
 async function send(){
   if(sending) return;
 
@@ -365,6 +390,8 @@ async function send(){
   sendBtn.disabled = true;
 
   addMessage("user", text);
+  rememberTemporaryMessage("user", text);
+
   input.value = "";
   addTyping();
 
@@ -377,7 +404,8 @@ async function send(){
       body:JSON.stringify({
         message:text,
         conversationId,
-        site_key:SITE_KEY
+        site_key:SITE_KEY,
+        language:USER_LANG
       })
     });
 
@@ -395,7 +423,12 @@ async function send(){
       return;
     }
 
-    addMessage("bot", data.reply || "No response.");
+    const reply = data.reply || "No response.";
+    addMessage("assistant", reply);
+    rememberTemporaryMessage("assistant", reply);
+
+    // Sync after first successful message so future human replies appear live.
+    setTimeout(refreshMessages, 600);
 
   }catch(err){
     removeTyping();
@@ -407,6 +440,52 @@ async function send(){
     input.focus();
   }
 }
+
+async function refreshMessages(){
+  if(!conversationId) return;
+
+  try{
+    const res = await fetch(`${KIRI_API}/admin/messages/${conversationId}`);
+    const data = await res.json();
+
+    if(!Array.isArray(data)) return;
+
+    for(const m of data){
+      const role = m.role || "assistant";
+      const content = m.content || "";
+
+      const uniqueKey = m.id
+        ? "id:" + m.id
+        : role + ":" + content + ":" + (m.created_at || "");
+
+      if(knownMessageIds.has(uniqueKey)) continue;
+
+      // Avoid duplicating messages we already added instantly after send().
+      if(isKnownTemp(role, content)){
+        knownMessageIds.add(uniqueKey);
+        continue;
+      }
+
+      // In widget, assistant and human both appear on the left.
+      if(role === "user"){
+        continue;
+      }
+
+      if(role === "human"){
+        addMessage("human", content);
+      }else{
+        addMessage("assistant", content);
+      }
+
+      knownMessageIds.add(uniqueKey);
+    }
+
+  }catch(err){
+    console.log("Widget refresh error:", err);
+  }
+}
+
+setInterval(refreshMessages, 2000);
 </script>
 
 </body>
