@@ -147,7 +147,7 @@ html,body{
 
 .user{
   align-self:flex-end;
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  background:linear-gradient(135deg,var(--blue),#1d4ed8);
   color:white;
   border-bottom-right-radius:6px;
 }
@@ -196,7 +196,7 @@ html,body{
 }
 
 #input:focus{
-  border-color:#3b82f6;
+  border-color:var(--blue);
   box-shadow:0 0 0 3px rgba(37,99,235,.18);
 }
 
@@ -204,7 +204,7 @@ html,body{
   width:46px;
   min-width:46px;
   height:46px;
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  background:linear-gradient(135deg,var(--blue),#3b82f6);
   border:0;
   border-radius:14px;
   color:white;
@@ -271,8 +271,10 @@ html,body{
   <div id="header">
     <div class="header-left">
       <div class="bot-avatar">✦</div>
+
       <div class="title-wrap">
         <div class="title">Kiri AI</div>
+
         <div class="status">
           <span class="live-dot"></span>
           <span>Online</span>
@@ -280,16 +282,18 @@ html,body{
       </div>
     </div>
 
-    <button id="close" aria-label="Close chat">×</button>
+    <button id="close">×</button>
   </div>
 
   <div id="messages">
-    <div class="msg bot welcome" id="welcomeMessage">Hi! How can I help you today?</div>
+    <div class="msg bot welcome" id="welcomeMessage">
+      Hi! How can I help you today?
+    </div>
   </div>
 
   <div id="inputBar">
     <input id="input" placeholder="Type your message..." autocomplete="off" />
-    <button id="sendBtn" aria-label="Send message">➤</button>
+    <button id="sendBtn">➤</button>
   </div>
 
   <div class="small-note">Powered by Kiri AI</div>
@@ -303,9 +307,14 @@ const SITE_KEY =
   new URLSearchParams(window.location.search).get("site_key") ||
   new URLSearchParams(window.location.search).get("siteKey");
 
-const USER_LANG = navigator.language || navigator.userLanguage || "en";
+const USER_LANG =
+  navigator.language ||
+  navigator.userLanguage ||
+  "en";
 
-let conversationId = sessionStorage.getItem("kiri_conversation_" + SITE_KEY);
+let conversationId =
+  sessionStorage.getItem("kiri_conversation_" + SITE_KEY);
+
 let sending = false;
 let knownMessageIds = new Set();
 
@@ -314,7 +323,10 @@ const messages = document.getElementById("messages");
 const sendBtn = document.getElementById("sendBtn");
 
 document.getElementById("close").onclick = () => {
-  parent.postMessage("kiri-close", "https://kiri-frontend.vercel.app");
+  parent.postMessage(
+    "kiri-close",
+    "https://kiri-frontend.vercel.app"
+  );
 };
 
 sendBtn.onclick = send;
@@ -326,6 +338,45 @@ input.addEventListener("keydown", (event) => {
   }
 });
 
+async function loadWidgetSettings(){
+  try{
+
+    const res = await fetch(
+      `${KIRI_API}/widget-settings?site_key=${SITE_KEY}`
+    );
+
+    const data = await res.json();
+
+    const title =
+      data.widget_title || "Kiri AI";
+
+    const welcome =
+      data.welcome_message ||
+      "Hi! How can I help you today?";
+
+    const color =
+      data.primary_color || "#2563eb";
+
+    document.querySelector(".title").innerText = title;
+
+    document.getElementById("welcomeMessage").innerText =
+      welcome;
+
+    document.querySelector(".bot-avatar").style.background =
+      `linear-gradient(135deg,${color},#22c55e,#a855f7)`;
+
+    document.documentElement.style.setProperty(
+      "--blue",
+      color
+    );
+
+  }catch(err){
+    console.log("Could not load widget settings", err);
+  }
+}
+
+loadWidgetSettings();
+
 function escapeHTML(str){
   return String(str || "")
     .replaceAll("&","&amp;")
@@ -336,27 +387,41 @@ function escapeHTML(str){
 }
 
 function addMessage(role, text){
+
   const div = document.createElement("div");
 
   let className = "msg bot";
+
   if(role === "user") className = "msg user";
   if(role === "human") className = "msg human";
   if(role === "assistant") className = "msg bot";
   if(role === "bot") className = "msg bot";
 
   div.className = className;
+
   div.innerHTML = escapeHTML(text);
 
   messages.appendChild(div);
+
   messages.scrollTop = messages.scrollHeight;
 }
 
 function addTyping(){
+
   const div = document.createElement("div");
+
   div.className = "msg bot";
   div.id = "typingBubble";
-  div.innerHTML = `<div class="typing"><span></span><span></span><span></span></div>`;
+
+  div.innerHTML =
+    `<div class="typing">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>`;
+
   messages.appendChild(div);
+
   messages.scrollTop = messages.scrollHeight;
 }
 
@@ -375,6 +440,7 @@ function isKnownTemp(role, content){
 }
 
 async function send(){
+
   if(sending) return;
 
   const text = input.value.trim();
@@ -382,7 +448,10 @@ async function send(){
   if(!text) return;
 
   if(!SITE_KEY){
-    addMessage("bot", "Missing site key. Please check your install script.");
+    addMessage(
+      "bot",
+      "Missing site key. Please check your install script."
+    );
     return;
   }
 
@@ -390,12 +459,15 @@ async function send(){
   sendBtn.disabled = true;
 
   addMessage("user", text);
+
   rememberTemporaryMessage("user", text);
 
   input.value = "";
+
   addTyping();
 
   try{
+
     const res = await fetch(`${KIRI_API}/ask`, {
       method:"POST",
       headers:{
@@ -414,43 +486,73 @@ async function send(){
     removeTyping();
 
     if(data.conversationId){
+
       conversationId = data.conversationId;
-      sessionStorage.setItem("kiri_conversation_" + SITE_KEY, conversationId);
+
+      sessionStorage.setItem(
+        "kiri_conversation_" + SITE_KEY,
+        conversationId
+      );
     }
 
     if(!res.ok){
-      addMessage("bot", data.error || "Something went wrong. Try again later.");
+
+      addMessage(
+        "bot",
+        data.error || "Something went wrong."
+      );
+
       return;
     }
 
-    const reply = data.reply || "No response.";
-    addMessage("assistant", reply);
-    rememberTemporaryMessage("assistant", reply);
+    const reply =
+      data.reply || "No response.";
 
-    // Sync after first successful message so future human replies appear live.
+    addMessage("assistant", reply);
+
+    rememberTemporaryMessage(
+      "assistant",
+      reply
+    );
+
     setTimeout(refreshMessages, 600);
 
   }catch(err){
+
     removeTyping();
-    addMessage("bot", "Server error. Try again later.");
+
+    addMessage(
+      "bot",
+      "Server error. Try again later."
+    );
+
     console.error(err);
+
   }finally{
+
     sending = false;
     sendBtn.disabled = false;
+
     input.focus();
   }
 }
 
 async function refreshMessages(){
+
   if(!conversationId) return;
 
   try{
-    const res = await fetch(`${KIRI_API}/admin/messages/${conversationId}`);
+
+    const res = await fetch(
+      `${KIRI_API}/admin/messages/${conversationId}`
+    );
+
     const data = await res.json();
 
     if(!Array.isArray(data)) return;
 
     for(const m of data){
+
       const role = m.role || "assistant";
       const content = m.content || "";
 
@@ -460,13 +562,11 @@ async function refreshMessages(){
 
       if(knownMessageIds.has(uniqueKey)) continue;
 
-      // Avoid duplicating messages we already added instantly after send().
       if(isKnownTemp(role, content)){
         knownMessageIds.add(uniqueKey);
         continue;
       }
 
-      // In widget, assistant and human both appear on the left.
       if(role === "user"){
         continue;
       }
