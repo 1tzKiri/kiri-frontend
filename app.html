@@ -1303,23 +1303,30 @@ function logout(){
 */
 async function loadDashboardData(){
   try{
-    /*
-    Example later:
-    const res = await fetch(API + "/dashboard-stats?site_key=" + user.site_key);
-    const data = await res.json();
+    const usageRes = await fetch(API + "/site-usage", {
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body:JSON.stringify({ siteKey:user.site_key })
+    });
 
-    document.getElementById("statConversations").innerText = data.conversations || 0;
-    document.getElementById("statMessages").innerText = data.messages || 0;
-    document.getElementById("statTakeovers").innerText = data.takeovers || 0;
-    */
+    const usage = await usageRes.json();
 
-    document.getElementById("statConversations").innerText = "0";
-    document.getElementById("statMessages").innerText = "0";
-    document.getElementById("statTakeovers").innerText = "0";
+    if(usage.plan){
+      document.getElementById("statPlan").innerText = usage.plan;
+      document.getElementById("profilePlan").innerText = usage.plan + " Plan";
+    }
 
-    document.getElementById("analyticsConversations").innerText = "0";
-    document.getElementById("analyticsMessages").innerText = "0";
-    document.getElementById("analyticsTakeovers").innerText = "0";
+    if(usage.monthlyUsed !== undefined){
+      document.getElementById("statMessages").innerText = usage.monthlyUsed;
+      document.getElementById("analyticsMessages").innerText = usage.monthlyUsed;
+    }
+
+    const convRes = await fetch(API + "/conversations?site_key=" + user.site_key);
+    const conversations = await convRes.json();
+
+    document.getElementById("statConversations").innerText = conversations.length || 0;
+    document.getElementById("analyticsConversations").innerText = conversations.length || 0;
+
   }catch(err){
     console.log("Dashboard stats not loaded yet", err);
   }
