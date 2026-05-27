@@ -1103,7 +1103,7 @@ async function loadConversations(){
     }
 
     box.innerHTML = conversations.map(c => `
-      <div class="conversationItem">
+  <div class="conversationItem" onclick="openConversation('${c.id}')">
         <strong>Conversation #${c.id}</strong>
         <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
       </div>
@@ -1113,6 +1113,26 @@ async function loadConversations(){
     console.log(err);
     box.innerHTML = `<p class="muted">Could not load conversations.</p>`;
   }
+}
+
+  async function openConversation(id){
+  const box = document.getElementById("conversationList");
+
+  box.innerHTML = `<p class="muted">Loading messages...</p>`;
+
+  const res = await fetch(API + "/admin/messages/" + id);
+  const messages = await res.json();
+
+  box.innerHTML = `
+    <button class="ghost" onclick="loadConversations()">← Back</button>
+    <div style="height:15px"></div>
+    ${messages.map(m => `
+      <div class="msg ${m.role === "user" ? "userMsg" : "bot"}" style="margin-bottom:10px">
+        <strong>${m.role}</strong><br>
+        ${m.content}
+      </div>
+    `).join("")}
+  `;
 }
 </script>
 
