@@ -309,6 +309,7 @@ let conversationId =
 
 let sending = false;
 let hasLoadedHistory = false;
+let knownMessageIds = new Set();
 
 const input = document.getElementById("input");
 const messages = document.getElementById("messages");
@@ -339,7 +340,14 @@ function escapeHTML(str){
     .replaceAll("'","&#039;");
 }
 
-function addMessage(role, text){
+function getMessageKey(m){
+  if(m.id) return "id:" + m.id;
+  return `${m.role || "assistant"}:${m.content || ""}:${m.created_at || ""}`;
+}
+
+function addMessage(role, text, key){
+  if(key && knownMessageIds.has(key)) return;
+
   const div = document.createElement("div");
 
   let className = "msg bot";
@@ -353,23 +361,41 @@ function addMessage(role, text){
   div.innerHTML = escapeHTML(text);
 
   messages.appendChild(div);
+
+  if(key) knownMessageIds.add(key);
+
   messages.scrollTop = messages.scrollHeight;
 }
 
 function renderMessagesFromDatabase(data){
   messages.innerHTML = "";
+  knownMessageIds.clear();
 
   if(!Array.isArray(data) || data.length === 0){
     const welcomeText =
       document.getElementById("welcomeMessage")?.innerText ||
       "Hi! How can I help you today?";
 
-    addMessage("bot", welcomeText);
+    addMessage("bot", welcomeText, "welcome");
     return;
   }
 
   data.forEach(m => {
-    addMessage(m.role || "assistant", m.content || "");
+    addMessage(m.role || "assistant", m.content || "", getMessageKey(m));
+  });
+
+  hasLoadedHistory = true;
+}
+
+function appendNewMessagesFromDatabase(data){
+  if(!Array.isArray(data)) return;
+
+  data.forEach(m => {
+    const key = getMessageKey(m);
+
+    if(knownMessageIds.has(key)) return;
+
+    addMessage(m.role || "assistant", m.content || "", key);
   });
 }
 
@@ -411,7 +437,7 @@ async function loadWidgetSettings(){
     document.documentElement.style.setProperty("--blue", color);
 
     const welcomeEl = document.getElementById("welcomeMessage");
-    if(welcomeEl){
+    if(welcomeEl && !hasLoadedHistory){
       welcomeEl.innerText = welcome;
     }
 
@@ -430,7 +456,8 @@ async function send(){
   if(!SITE_KEY){
     addMessage(
       "bot",
-      "Missing site key. Please check your install script."
+      "Missing site key. Please check your install script.",
+      "missing-site-key"
     );
     return;
   }
@@ -438,11 +465,11 @@ async function send(){
   sending = true;
   sendBtn.disabled = true;
 
-  if(!hasLoadedHistory && !conversationId){
-    hasLoadedHistory = true;
-  }
-
-  addMessage("user", text);
+  addMessage(
+    "user",
+    text,
+    "local-user-" + Date.now() + "-" + text
+  );
 
   input.value = "";
   addTyping();
@@ -477,12 +504,19 @@ async function send(){
     if(!res.ok){
       addMessage(
         "bot",
-        data.error || "Something went wrong."
+        data.error || "Something went wrong.",
+        "error-" + Date.now()
       );
       return;
     }
 
-    addMessage("assistant", data.reply || "No response.");
+    const reply = data.reply || "No response.";
+
+    addMessage(
+      "assistant",
+      reply,
+      "local-assistant-" + Date.now() + "-" + reply
+    );
 
     setTimeout(refreshMessages, 800);
 
@@ -491,7 +525,8 @@ async function send(){
 
     addMessage(
       "bot",
-      "Server error. Try again later."
+      "Server error. Try again later.",
+      "server-error-" + Date.now()
     );
 
     console.error(err);
@@ -515,8 +550,11 @@ async function refreshMessages(){
 
     if(!Array.isArray(data)) return;
 
-    renderMessagesFromDatabase(data);
-    hasLoadedHistory = true;
+    if(!hasLoadedHistory){
+      renderMessagesFromDatabase(data);
+    }else{
+      appendNewMessagesFromDatabase(data);
+    }
 
   }catch(err){
     console.log("Widget refresh error:", err);
@@ -532,7 +570,7 @@ async function init(){
 }
 
 init();
-setInterval(refreshMessages, 3000);
+setInterval(refreshMessages, 2000);
 </script>
 
 </body>
