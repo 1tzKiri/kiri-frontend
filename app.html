@@ -74,6 +74,28 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .conversationItem{padding:16px;border:1px solid var(--border);border-radius:14px;background:#0f172a;margin-bottom:12px;cursor:pointer}
 .conversationItem:hover{border-color:#3b82f6;background:rgba(37,99,235,.12)}
 .liveMessages{height:500px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding-right:8px}
+
+.badgeDot{
+  margin-left:auto;
+  background:#ef4444;
+  color:white;
+  font-size:12px;
+  padding:3px 7px;
+  border-radius:999px;
+}
+
+.needReplyBadge{
+  display:inline-block;
+  margin-top:8px;
+  background:rgba(239,68,68,.15);
+  color:#fecaca;
+  border:1px solid rgba(239,68,68,.35);
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+}
+
 .adminOnly{display:flex}body.client .adminOnly{display:none!important}
 @media(max-width:1200px){.statsGrid,.quickGrid{grid-template-columns:repeat(2,1fr)}.dashboardGrid,.pageGrid{grid-template-columns:1fr}}
 @media(max-width:800px){.page{flex-direction:column}.sidebar{width:100%;height:auto;position:relative}.statsGrid,.quickGrid,.installSteps{grid-template-columns:1fr}.main{padding:20px}}
@@ -101,7 +123,9 @@ button:disabled{opacity:.55;cursor:not-allowed}
       <nav class="nav">
         <button class="active" data-page="dashboard" onclick="show('dashboard', this)">🏠 Overview</button>
         <button data-page="conversations" onclick="show('conversations', this)">💬 Conversations</button>
-        <button data-page="livechat" onclick="show('livechat', this)">🟢 Live Chat</button>
+        <button data-page="livechat" onclick="show('livechat', this)">
+          🟢 Live Chat <span id="liveBadge" class="badgeDot hidden">0</span>
+        </button>
         <button data-page="knowledge" onclick="show('knowledge', this)">🧠 Knowledge Base</button>
         <button data-page="settings" onclick="show('settings', this)">⚙️ Widget Settings</button>
         <button data-page="install" onclick="show('install', this)">📥 Install Widget</button>
@@ -604,6 +628,15 @@ async function loadDashboardData(){
       document.getElementById("statTakeovers").innerText = activeTakeovers;
       document.getElementById("analyticsTakeovers").innerText = activeTakeovers;
 
+      const badge = document.getElementById("liveBadge");
+
+      if(activeTakeovers > 0){
+        badge.innerText = activeTakeovers;
+        badge.classList.remove("hidden");
+      }else{
+        badge.classList.add("hidden");
+      }
+
       renderRecentConversations(conversations);
     }
 
@@ -691,7 +724,11 @@ async function loadLiveChats(){
     const res = await fetch(API + "/conversations?site_key=" + user.site_key);
     const conversations = await res.json();
 
-    const filtered = Array.isArray(conversations) ? conversations.filter(c => c.human_takeover) : [];
+    const filtered = Array.isArray(conversations)
+      ? conversations
+          .filter(c => c.human_takeover)
+          .sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
+      : [];
 
     if(filtered.length === 0){
       box.innerHTML = `<div class="emptyState"><div><strong>No active takeovers</strong>Human takeover chats will appear here.</div></div>`;
@@ -702,6 +739,7 @@ async function loadLiveChats(){
       <div class="conversationItem" onclick="openLiveConversation('${c.id}')">
         <strong>Conversation #${c.id}</strong>
         <p class="muted">Human takeover active</p>
+        <span class="needReplyBadge">Needs reply</span>
       </div>
     `).join("");
 
@@ -779,6 +817,22 @@ async function returnToAI(){
     </div>
   `;
 }
+
+setInterval(() => {
+  if(!user) return;
+
+  loadDashboardData();
+
+  const livechat = document.getElementById("livechat");
+
+  if(livechat && !livechat.classList.contains("hidden")){
+    loadLiveChats();
+
+    if(currentLiveConversation){
+      openLiveConversation(currentLiveConversation);
+    }
+  }
+}, 3000);
 </script>
 
 </body>
