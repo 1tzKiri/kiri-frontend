@@ -64,7 +64,7 @@ html,body{
   width:34px;
   height:34px;
   border-radius:12px;
-  background:linear-gradient(135deg,#2563eb,#22c55e,#a855f7);
+  background:linear-gradient(135deg,var(--blue),#22c55e,#a855f7);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -249,17 +249,9 @@ html,body{
 }
 
 @media(max-width:520px){
-  #kiri-widget{
-    border-radius:20px;
-  }
-
-  #messages{
-    padding:14px;
-  }
-
-  .msg{
-    max-width:88%;
-  }
+  #kiri-widget{border-radius:20px}
+  #messages{padding:14px}
+  .msg{max-width:88%}
 }
 </style>
 </head>
@@ -316,7 +308,7 @@ let conversationId =
   sessionStorage.getItem("kiri_conversation_" + SITE_KEY);
 
 let sending = false;
-let knownMessageIds = new Set();
+let hasLoadedHistory = false;
 
 const input = document.getElementById("input");
 const messages = document.getElementById("messages");
@@ -338,45 +330,6 @@ input.addEventListener("keydown", (event) => {
   }
 });
 
-async function loadWidgetSettings(){
-  try{
-
-    const res = await fetch(
-      `${KIRI_API}/widget-settings?site_key=${SITE_KEY}`
-    );
-
-    const data = await res.json();
-
-    const title =
-      data.widget_title || "Kiri AI";
-
-    const welcome =
-      data.welcome_message ||
-      "Hi! How can I help you today?";
-
-    const color =
-      data.primary_color || "#2563eb";
-
-    document.querySelector(".title").innerText = title;
-
-    document.getElementById("welcomeMessage").innerText =
-      welcome;
-
-    document.querySelector(".bot-avatar").style.background =
-      `linear-gradient(135deg,${color},#22c55e,#a855f7)`;
-
-    document.documentElement.style.setProperty(
-      "--blue",
-      color
-    );
-
-  }catch(err){
-    console.log("Could not load widget settings", err);
-  }
-}
-
-loadWidgetSettings();
-
 function escapeHTML(str){
   return String(str || "")
     .replaceAll("&","&amp;")
@@ -387,7 +340,6 @@ function escapeHTML(str){
 }
 
 function addMessage(role, text){
-
   const div = document.createElement("div");
 
   let className = "msg bot";
@@ -398,21 +350,33 @@ function addMessage(role, text){
   if(role === "bot") className = "msg bot";
 
   div.className = className;
-
   div.innerHTML = escapeHTML(text);
 
   messages.appendChild(div);
-
   messages.scrollTop = messages.scrollHeight;
 }
 
+function renderMessagesFromDatabase(data){
+  messages.innerHTML = "";
+
+  if(!Array.isArray(data) || data.length === 0){
+    const welcomeText =
+      document.getElementById("welcomeMessage")?.innerText ||
+      "Hi! How can I help you today?";
+
+    addMessage("bot", welcomeText);
+    return;
+  }
+
+  data.forEach(m => {
+    addMessage(m.role || "assistant", m.content || "");
+  });
+}
+
 function addTyping(){
-
   const div = document.createElement("div");
-
   div.className = "msg bot";
   div.id = "typingBubble";
-
   div.innerHTML =
     `<div class="typing">
       <span></span>
@@ -421,7 +385,6 @@ function addTyping(){
     </div>`;
 
   messages.appendChild(div);
-
   messages.scrollTop = messages.scrollHeight;
 }
 
@@ -430,17 +393,34 @@ function removeTyping(){
   if(typing) typing.remove();
 }
 
-function rememberTemporaryMessage(role, content){
-  const tempKey = role + ":" + content;
-  knownMessageIds.add(tempKey);
-}
+async function loadWidgetSettings(){
+  try{
+    const res = await fetch(
+      `${KIRI_API}/widget-settings?site_key=${SITE_KEY}`
+    );
 
-function isKnownTemp(role, content){
-  return knownMessageIds.has(role + ":" + content);
+    const data = await res.json();
+
+    const title = data.widget_title || "Kiri AI";
+    const welcome =
+      data.welcome_message ||
+      "Hi! How can I help you today?";
+    const color = data.primary_color || "#2563eb";
+
+    document.querySelector(".title").innerText = title;
+    document.documentElement.style.setProperty("--blue", color);
+
+    const welcomeEl = document.getElementById("welcomeMessage");
+    if(welcomeEl){
+      welcomeEl.innerText = welcome;
+    }
+
+  }catch(err){
+    console.log("Could not load widget settings", err);
+  }
 }
 
 async function send(){
-
   if(sending) return;
 
   const text = input.value.trim();
@@ -458,16 +438,16 @@ async function send(){
   sending = true;
   sendBtn.disabled = true;
 
+  if(!hasLoadedHistory && !conversationId){
+    hasLoadedHistory = true;
+  }
+
   addMessage("user", text);
 
-  rememberTemporaryMessage("user", text);
-
   input.value = "";
-
   addTyping();
 
   try{
-
     const res = await fetch(`${KIRI_API}/ask`, {
       method:"POST",
       headers:{
@@ -486,7 +466,6 @@ async function send(){
     removeTyping();
 
     if(data.conversationId){
-
       conversationId = data.conversationId;
 
       sessionStorage.setItem(
@@ -496,29 +475,18 @@ async function send(){
     }
 
     if(!res.ok){
-
       addMessage(
         "bot",
         data.error || "Something went wrong."
       );
-
       return;
     }
 
-    const reply =
-      data.reply || "No response.";
+    addMessage("assistant", data.reply || "No response.");
 
-    addMessage("assistant", reply);
-
-    rememberTemporaryMessage(
-      "assistant",
-      reply
-    );
-
-    setTimeout(refreshMessages, 600);
+    setTimeout(refreshMessages, 800);
 
   }catch(err){
-
     removeTyping();
 
     addMessage(
@@ -529,63 +497,42 @@ async function send(){
     console.error(err);
 
   }finally{
-
     sending = false;
     sendBtn.disabled = false;
-
     input.focus();
   }
 }
 
 async function refreshMessages(){
-
-  if(!conversationId) return;
+  if(!conversationId || !SITE_KEY) return;
 
   try{
-
     const res = await fetch(
-      `${KIRI_API}/admin/messages/${conversationId}`
+      `${KIRI_API}/messages/${conversationId}?site_key=${SITE_KEY}`
     );
 
     const data = await res.json();
 
     if(!Array.isArray(data)) return;
 
-    for(const m of data){
-
-      const role = m.role || "assistant";
-      const content = m.content || "";
-
-      const uniqueKey = m.id
-        ? "id:" + m.id
-        : role + ":" + content + ":" + (m.created_at || "");
-
-      if(knownMessageIds.has(uniqueKey)) continue;
-
-      if(isKnownTemp(role, content)){
-        knownMessageIds.add(uniqueKey);
-        continue;
-      }
-
-      if(role === "user"){
-        continue;
-      }
-
-      if(role === "human"){
-        addMessage("human", content);
-      }else{
-        addMessage("assistant", content);
-      }
-
-      knownMessageIds.add(uniqueKey);
-    }
+    renderMessagesFromDatabase(data);
+    hasLoadedHistory = true;
 
   }catch(err){
     console.log("Widget refresh error:", err);
   }
 }
 
-setInterval(refreshMessages, 2000);
+async function init(){
+  await loadWidgetSettings();
+
+  if(conversationId){
+    setTimeout(refreshMessages, 1000);
+  }
+}
+
+init();
+setInterval(refreshMessages, 3000);
 </script>
 
 </body>
