@@ -743,27 +743,33 @@ async function sendLiveReply(){
 
   if(!message) return;
 
-  await fetch(API + "/reply", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
-      conversationId: currentLiveConversation,
-      message
-    })
-  });
+await fetch(API + "/reply", {
+  method:"POST",
+  headers:{ "Content-Type":"application/json" },
+  body:JSON.stringify({
+    conversationId: currentLiveConversation,
+    message,
+    site_key:user.site_key
+  })
+});
 
-  input.value = "";
-  openLiveConversation(currentLiveConversation);
+input.value = "";
+openLiveConversation(currentLiveConversation);
 }
 
 async function returnToAI(){
+
   if(!currentLiveConversation) return;
 
   await fetch(API + "/return-to-ai", {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ conversationId: currentLiveConversation })
+    body:JSON.stringify({
+      conversationId: currentLiveConversation,
+      site_key:user.site_key
+    })
   });
+}
 
   currentLiveConversation = null;
   loadLiveChats();
