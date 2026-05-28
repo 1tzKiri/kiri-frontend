@@ -665,7 +665,7 @@ async function openConversation(id){
   box.innerHTML = `<p class="muted">Loading messages...</p>`;
 
   try{
-    const res = await fetch(API + "/messages/" + id);
+    const res = await fetch(API + "/messages/" + id + "?site_key=" + user.site_key);
     const messages = await res.json();
 
     box.innerHTML = `
@@ -718,7 +718,7 @@ async function openLiveConversation(id){
   box.innerHTML = `<p class="muted">Loading messages...</p>`;
 
   try{
-    const res = await fetch(API + "/messages/" + id);
+    const res = await fetch(API + "/messages/" + id + "?site_key=" + user.site_key);
     const messages = await res.json();
 
     box.innerHTML = messages.map(m => `
