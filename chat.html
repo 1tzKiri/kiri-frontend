@@ -309,7 +309,10 @@ let conversationId =
 
 let sending = false;
 let hasLoadedHistory = false;
+let humanMode = false;
+
 let knownMessageIds = new Set();
+let localEchoes = new Set();
 
 const input = document.getElementById("input");
 const messages = document.getElementById("messages");
@@ -346,6 +349,7 @@ function getMessageKey(m){
 }
 
 function addMessage(role, text, key){
+  if(!text) return;
   if(key && knownMessageIds.has(key)) return;
 
   const div = document.createElement("div");
@@ -370,6 +374,7 @@ function addMessage(role, text, key){
 function renderMessagesFromDatabase(data){
   messages.innerHTML = "";
   knownMessageIds.clear();
+  localEchoes.clear();
 
   if(!Array.isArray(data) || data.length === 0){
     const welcomeText =
@@ -392,14 +397,25 @@ function appendNewMessagesFromDatabase(data){
 
   data.forEach(m => {
     const key = getMessageKey(m);
+    const role = m.role || "assistant";
+    const content = m.content || "";
+    const echoKey = role + ":" + content;
 
     if(knownMessageIds.has(key)) return;
 
-    addMessage(m.role || "assistant", m.content || "", key);
+    if(localEchoes.has(echoKey)){
+      knownMessageIds.add(key);
+      localEchoes.delete(echoKey);
+      return;
+    }
+
+    addMessage(role, content, key);
   });
 }
 
 function addTyping(){
+  if(document.getElementById("typingBubble")) return;
+
   const div = document.createElement("div");
   div.className = "msg bot";
   div.id = "typingBubble";
@@ -466,17 +482,19 @@ async function send(){
   sending = true;
   sendBtn.disabled = true;
 
-  // local user message
   addMessage(
     "user",
     text,
     "local-user-" + Date.now()
   );
 
+  localEchoes.add("user:" + text);
+
   input.value = "";
 
-  // typing ONLY if AI takeover not active
-  addTyping();
+  if(!humanMode){
+    addTyping();
+  }
 
   try{
 
@@ -518,23 +536,18 @@ async function send(){
       return;
     }
 
-    // IMPORTANT:
-    // if human takeover active -> NO AI MESSAGE
     if(data.human_takeover === true){
-
-      setTimeout(refreshMessages, 500);
-
-      return;
+      humanMode = true;
     }
 
-    // add AI reply ONLY ONCE
     if(data.reply){
-
       addMessage(
         "assistant",
         data.reply,
-        "assistant-" + Date.now()
+        "local-assistant-" + Date.now()
       );
+
+      localEchoes.add("assistant:" + data.reply);
     }
 
     setTimeout(refreshMessages, 600);
