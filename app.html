@@ -362,8 +362,17 @@ const API = "https://kiri-backend-prod-production.up.railway.app";
 let user = null;
 let currentLiveConversation = null;
 
-try { user = JSON.parse(localStorage.getItem("user")); } catch(e){}
-if (user) startApp();
+let dashboardLoaded = false;
+let liveChatsCache = [];
+let currentMessagesCache = "";
+
+try{
+  user = JSON.parse(localStorage.getItem("user"));
+}catch(e){}
+
+if(user){
+  startApp();
+}
 
 function startApp(){
   document.getElementById("auth").classList.add("hidden");
@@ -371,22 +380,23 @@ function startApp(){
 
   document.body.classList.remove("admin","client");
 
-  if (user.role === "admin") {
+  if(user.role === "admin"){
     document.body.classList.add("admin");
     document.getElementById("roleBadge").innerText = "Admin Dashboard";
-  } else {
+  }else{
     document.body.classList.add("client");
     document.getElementById("roleBadge").innerText = "Client Dashboard";
   }
 
   const siteKey = user.site_key || "missing-site-key";
   const email = user.email || "Kiri AI User";
-  const plan = user.plan || user.current_plan || "Free";
+  const plan = user.plan || "Free";
 
   document.getElementById("profileEmail").innerText = email;
   document.getElementById("profilePlan").innerText = plan + " Plan";
-  document.getElementById("avatarLetter").innerText = email.charAt(0).toUpperCase();
-  document.getElementById("statPlan").innerText = plan;
+  document.getElementById("avatarLetter").innerText =
+    email.charAt(0).toUpperCase();
+
   document.getElementById("siteKeyBox").innerText = siteKey;
 
   document.getElementById("embedBox").innerText =
@@ -397,7 +407,18 @@ function startApp(){
 }
 
 function show(id, btn){
-  const pages = ["dashboard","conversations","livechat","knowledge","settings","install","analytics","pricing","admin"];
+
+  const pages = [
+    "dashboard",
+    "conversations",
+    "livechat",
+    "knowledge",
+    "settings",
+    "install",
+    "analytics",
+    "pricing",
+    "admin"
+  ];
 
   pages.forEach(x=>{
     const el = document.getElementById(x);
@@ -405,385 +426,274 @@ function show(id, btn){
   });
 
   const target = document.getElementById(id);
-  if(target) target.classList.remove("hidden");
 
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-
-  if(btn){ btn.classList.add("active"); }
-  else {
-    const found = document.querySelector(`.nav button[data-page="${id}"]`);
-    if(found) found.classList.add("active");
+  if(target){
+    target.classList.remove("hidden");
   }
 
-  if(id === "conversations") loadConversations();
-  if(id === "livechat") loadLiveChats();
-  if(id === "settings") loadWidgetSettings();
-}
+  document
+    .querySelectorAll(".nav button")
+    .forEach(b=>b.classList.remove("active"));
 
-async function register(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if(!email || !password){
-    document.getElementById("authMsg").innerText = "Enter email and password";
-    return;
+  if(btn){
+    btn.classList.add("active");
   }
 
-  const res = await fetch(API + "/register", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-
-  if(!data.site_key){
-    document.getElementById("authMsg").innerText = "Register failed";
-    return;
+  if(id === "conversations"){
+    loadConversations();
   }
 
-  user = {
-    id:data.id,
-    email:data.email || email,
-    role:data.role || "user",
-    site_key:data.site_key,
-    plan:"Free"
-  };
-
-  localStorage.setItem("user", JSON.stringify(user));
-  startApp();
-}
-
-async function login(){
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if(!email || !password){
-    document.getElementById("authMsg").innerText = "Enter email and password";
-    return;
+  if(id === "livechat"){
+    loadLiveChats();
   }
 
-  const res = await fetch(API + "/login", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-
-  if(!data.success){
-    document.getElementById("authMsg").innerText = "Wrong login";
-    return;
-  }
-
-  user = data;
-  localStorage.setItem("user", JSON.stringify(user));
-  startApp();
-}
-
-async function buy(){
-  const res = await fetch(API + "/create-checkout", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({ site_key:user.site_key })
-  });
-
-  const data = await res.json();
-
-  if(!data.url){
-    alert("Stripe error");
-    return;
-  }
-
-  window.location.href = data.url;
-}
-
-function copyEmbed(){
-  const code = document.getElementById("embedBox").innerText;
-  navigator.clipboard.writeText(code);
-  alert("Install code copied!");
-}
-
-function logout(){
-  localStorage.removeItem("user");
-  location.reload();
-}
-
-async function loadWidgetSettings(){
-  try{
-    const res = await fetch(API + "/widget-settings?site_key=" + user.site_key);
-    const data = await res.json();
-
-    const title = data.widget_title || "Kiri AI";
-    const color = data.primary_color || "#2563eb";
-    const welcome = data.welcome_message || "Hi! How can I help you today?";
-    const instructions = data.bot_instructions || "";
-
-    const widgetTitle = document.getElementById("widgetTitle");
-    const widgetColor = document.getElementById("widgetColor");
-    const welcomeMessage = document.getElementById("welcomeMessage");
-    const botInstructions = document.getElementById("botInstructions");
-
-    if(widgetTitle) widgetTitle.value = title;
-    if(widgetColor) widgetColor.value = color;
-    if(welcomeMessage) welcomeMessage.value = welcome;
-    if(botInstructions) botInstructions.value = instructions;
-
-    updatePreview(title, color, welcome);
-
-  }catch(err){
-    console.log("Could not load widget settings", err);
-  }
-}
-
-async function saveWidgetSettings(){
-  try{
-    await fetch(API + "/widget-settings", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({
-        site_key:user.site_key,
-        widget_title:document.getElementById("widgetTitle").value,
-        welcome_message:document.getElementById("welcomeMessage").value,
-        primary_color:document.getElementById("widgetColor").value,
-        bot_instructions:document.getElementById("botInstructions").value
-      })
-    });
-
-    alert("Settings saved!");
+  if(id === "settings"){
     loadWidgetSettings();
-
-  }catch(err){
-    console.log(err);
-    alert("Failed saving settings");
   }
-}
-
-function updatePreview(titleArg, colorArg, welcomeArg){
-  const title = titleArg || document.getElementById("widgetTitle")?.value || "Kiri AI";
-  const color = colorArg || document.getElementById("widgetColor")?.value || "#2563eb";
-  const welcome = welcomeArg || document.getElementById("welcomeMessage")?.value || "Hi! How can I help you today?";
-
-  ["previewTitle","settingsPreviewTitle"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.innerText = title;
-  });
-
-  ["previewWelcome","settingsPreviewWelcome"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.innerText = welcome;
-  });
-
-  ["previewHeader","settingsPreviewHeader"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.style.background = `linear-gradient(135deg,#0f172a,${color})`;
-  });
 }
 
 async function loadDashboardData(){
+
   try{
-    const usageRes = await fetch(API + "/site-usage", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ siteKey:user.site_key })
-    });
 
-    const usage = await usageRes.json();
+    const convRes = await fetch(
+      API + "/conversations?site_key=" + user.site_key
+    );
 
-    if(usage.plan){
-      const cleanPlan = usage.plan.toLowerCase();
-      const displayPlan = cleanPlan.charAt(0).toUpperCase() + cleanPlan.slice(1);
-
-      document.getElementById("statPlan").innerText = displayPlan;
-      document.getElementById("profilePlan").innerText = displayPlan + " Plan";
-      document.getElementById("billingCurrentPlan").innerText = displayPlan + " Plan";
-
-      if(cleanPlan === "pro"){
-        document.getElementById("planSubtext").innerText = "You are currently on Pro.";
-        document.getElementById("billingPlanText").innerText = "You are currently on the Pro plan.";
-        document.getElementById("proBuyBtn").innerText = "Already on Pro";
-        document.getElementById("proBuyBtn").disabled = true;
-        document.getElementById("upgradeBox").style.display = "none";
-      } else {
-        document.getElementById("planSubtext").innerText = "Upgrade to unlock more features.";
-        document.getElementById("billingPlanText").innerText = "Basic chatbot access for testing.";
-        document.getElementById("proBuyBtn").innerText = "Buy Pro";
-        document.getElementById("proBuyBtn").disabled = false;
-      }
-    }
-
-    if(usage.monthlyUsed !== undefined){
-      document.getElementById("statMessages").innerText = usage.monthlyUsed;
-      document.getElementById("analyticsMessages").innerText = usage.monthlyUsed;
-    }
-
-    const convRes = await fetch(API + "/conversations?site_key=" + user.site_key);
     const conversations = await convRes.json();
 
-    if(Array.isArray(conversations)){
-      document.getElementById("statConversations").innerText = conversations.length;
-      document.getElementById("analyticsConversations").innerText = conversations.length;
+    if(!Array.isArray(conversations)) return;
 
-      const activeTakeovers = conversations.filter(c => c.human_takeover).length;
-      document.getElementById("statTakeovers").innerText = activeTakeovers;
-      document.getElementById("analyticsTakeovers").innerText = activeTakeovers;
+    const activeTakeovers =
+      conversations.filter(c=>c.human_takeover).length;
 
-      const badge = document.getElementById("liveBadge");
+    document.getElementById("statConversations").innerText =
+      conversations.length;
 
-      if(activeTakeovers > 0){
-        badge.innerText = activeTakeovers;
-        badge.classList.remove("hidden");
-      }else{
-        badge.classList.add("hidden");
-      }
+    document.getElementById("analyticsConversations").innerText =
+      conversations.length;
 
-      renderRecentConversations(conversations);
+    document.getElementById("statTakeovers").innerText =
+      activeTakeovers;
+
+    document.getElementById("analyticsTakeovers").innerText =
+      activeTakeovers;
+
+    const badge = document.getElementById("liveBadge");
+
+    if(activeTakeovers > 0){
+      badge.innerText = activeTakeovers;
+      badge.classList.remove("hidden");
+    }else{
+      badge.classList.add("hidden");
     }
 
+    renderRecentConversations(conversations);
+
   }catch(err){
-    console.log("Dashboard stats not loaded yet", err);
+    console.log(err);
   }
 }
 
 function renderRecentConversations(conversations){
+
   const box = document.getElementById("recentConversationList");
+
   if(!box) return;
 
-  if(!Array.isArray(conversations) || conversations.length === 0){
-    box.className = "emptyState";
-    box.innerHTML = `<div><strong>No conversations yet</strong>Your conversations will appear here.</div>`;
-    return;
-  }
+  conversations.sort(
+    (a,b)=>new Date(b.created_at)-new Date(a.created_at)
+  );
 
-  box.className = "";
-  box.innerHTML = conversations.slice(0,3).map(c => `
-    <div class="conversationItem" onclick="openConversation('${c.id}')">
+  box.innerHTML = conversations.slice(0,3).map(c=>`
+    <div class="conversationItem"
+      onclick="openConversation('${c.id}')">
+
       <strong>Conversation #${c.id}</strong>
-      <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
+
+      <p class="muted">
+        ${new Date(c.created_at).toLocaleString()}
+      </p>
+
     </div>
   `).join("");
 }
 
 async function loadConversations(){
-  const box = document.getElementById("conversationList");
-  if(!box) return;
 
-  box.innerHTML = `<p class="muted">Loading conversations...</p>`;
+  const box = document.getElementById("conversationList");
+
+  box.innerHTML = `<p class="muted">Loading...</p>`;
 
   try{
-    const res = await fetch(API + "/conversations?site_key=" + user.site_key);
+
+    const res = await fetch(
+      API + "/conversations?site_key=" + user.site_key
+    );
+
     const conversations = await res.json();
 
-    if(!Array.isArray(conversations) || conversations.length === 0){
-      box.innerHTML = `<div class="emptyState"><div><strong>No conversations yet</strong>Once people use your widget, chats will appear here.</div></div>`;
+    if(!Array.isArray(conversations)){
+      box.innerHTML = "No conversations";
       return;
     }
 
-    box.innerHTML = conversations.map(c => `
-      <div class="conversationItem" onclick="openConversation('${c.id}')">
+    conversations.sort(
+      (a,b)=>new Date(b.created_at)-new Date(a.created_at)
+    );
+
+    box.innerHTML = conversations.map(c=>`
+      <div class="conversationItem"
+        onclick="openConversation('${c.id}')">
+
         <strong>Conversation #${c.id}</strong>
-        <p class="muted">Created: ${new Date(c.created_at).toLocaleString()}</p>
-        ${c.human_takeover ? `<p style="color:#22c55e;font-weight:800">Human takeover active</p>` : ``}
+
+        <p class="muted">
+          ${new Date(c.created_at).toLocaleString()}
+        </p>
+
+        ${
+          c.human_takeover
+          ? `<p style="color:#22c55e;font-weight:800">
+              Human takeover active
+            </p>`
+          : ``
+        }
+
       </div>
     `).join("");
 
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Could not load conversations.</p>`;
-  }
-}
-
-async function openConversation(id){
-  const box = document.getElementById("conversationList");
-  box.innerHTML = `<p class="muted">Loading messages...</p>`;
-
-  try{
-    const res = await fetch(API + "/messages/" + id + "?site_key=" + user.site_key);
-    const messages = await res.json();
-
-    box.innerHTML = `
-      <button class="ghost" onclick="loadConversations()">← Back</button>
-      <div style="height:15px"></div>
-      ${messages.map(m => `
-        <div class="msg ${m.role === "user" ? "userMsg" : "bot"}" style="margin-bottom:10px">
-          <strong>${m.role}</strong><br>${m.content}
-        </div>
-      `).join("")}
-    `;
-  }catch(err){
-    console.log(err);
-    box.innerHTML = `<p class="muted">Could not load messages.</p>`;
   }
 }
 
 async function loadLiveChats(){
-  const box = document.getElementById("liveChatList");
-  box.innerHTML = `<p class="muted">Loading...</p>`;
 
   try{
-    const res = await fetch(API + "/conversations?site_key=" + user.site_key);
+
+    const res = await fetch(
+      API + "/conversations?site_key=" + user.site_key
+    );
+
     const conversations = await res.json();
 
-    const filtered = Array.isArray(conversations)
-      ? conversations
-          .filter(c => c.human_takeover)
-          .sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))
-      : [];
+    if(!Array.isArray(conversations)) return;
 
-    if(filtered.length === 0){
-      box.innerHTML = `<div class="emptyState"><div><strong>No active takeovers</strong>Human takeover chats will appear here.</div></div>`;
+    const filtered = conversations
+      .filter(c=>c.human_takeover)
+      .sort(
+        (a,b)=>new Date(b.created_at)-new Date(a.created_at)
+      );
+
+    const json = JSON.stringify(filtered);
+
+    if(json === JSON.stringify(liveChatsCache)){
       return;
     }
 
-    box.innerHTML = filtered.map(c => `
-      <div class="conversationItem" onclick="openLiveConversation('${c.id}')">
+    liveChatsCache = filtered;
+
+    const box = document.getElementById("liveChatList");
+
+    if(filtered.length === 0){
+
+      box.innerHTML = `
+        <div class="emptyState">
+          <div>
+            <strong>No active takeovers</strong>
+            Human takeover chats will appear here.
+          </div>
+        </div>
+      `;
+
+      return;
+    }
+
+    box.innerHTML = filtered.map(c=>`
+      <div class="conversationItem"
+        onclick="openLiveConversation('${c.id}')">
+
         <strong>Conversation #${c.id}</strong>
-        <p class="muted">Human takeover active</p>
-        <span class="needReplyBadge">Needs reply</span>
+
+        <p class="muted">
+          Human takeover active
+        </p>
+
+        <span class="needReplyBadge">
+          Needs reply
+        </span>
+
       </div>
     `).join("");
 
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Failed loading chats.</p>`;
   }
 }
 
 async function openLiveConversation(id){
+
   currentLiveConversation = id;
 
-  const box = document.getElementById("liveChatMessages");
-  box.innerHTML = `<p class="muted">Loading messages...</p>`;
-
   try{
-    const res = await fetch(API + "/messages/" + id + "?site_key=" + user.site_key);
+
+    const res = await fetch(
+      API + "/messages/" + id +
+      "?site_key=" + user.site_key
+    );
+
     const messages = await res.json();
 
-    box.innerHTML = messages.map(m => `
-      <div class="msg ${m.role === "user" ? "userMsg" : "bot"}">
-        <strong>${m.role}</strong><br>${m.content}
+    const html = messages.map(m=>`
+      <div class="msg ${
+        m.role === "user"
+        ? "userMsg"
+        : m.role === "human"
+        ? "bot"
+        : "bot"
+      }">
+
+        <strong>${m.role}</strong><br>
+        ${m.content}
+
       </div>
     `).join("");
+
+    if(html === currentMessagesCache){
+      return;
+    }
+
+    currentMessagesCache = html;
+
+    const box =
+      document.getElementById("liveChatMessages");
+
+    box.innerHTML = html;
 
     box.scrollTop = box.scrollHeight;
 
   }catch(err){
     console.log(err);
-    box.innerHTML = `<p class="muted">Could not load messages.</p>`;
   }
 }
 
 async function sendLiveReply(){
+
   if(!currentLiveConversation) return;
 
-  const input = document.getElementById("liveReplyInput");
+  const input =
+    document.getElementById("liveReplyInput");
+
   const message = input.value.trim();
 
   if(!message) return;
 
   await fetch(API + "/reply", {
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
+    headers:{
+      "Content-Type":"application/json"
+    },
     body:JSON.stringify({
       conversationId: currentLiveConversation,
       message: message,
@@ -792,15 +702,21 @@ async function sendLiveReply(){
   });
 
   input.value = "";
-  openLiveConversation(currentLiveConversation);
+
+  await openLiveConversation(currentLiveConversation);
+
+  await loadDashboardData();
 }
 
 async function returnToAI(){
+
   if(!currentLiveConversation) return;
 
   await fetch(API + "/return-to-ai", {
     method:"POST",
-    headers:{ "Content-Type":"application/json" },
+    headers:{
+      "Content-Type":"application/json"
+    },
     body:JSON.stringify({
       conversationId: currentLiveConversation,
       site_key: user.site_key
@@ -808,31 +724,47 @@ async function returnToAI(){
   });
 
   currentLiveConversation = null;
-  loadLiveChats();
-  loadDashboardData();
+  currentMessagesCache = "";
 
-  document.getElementById("liveChatMessages").innerHTML = `
+  document.getElementById(
+    "liveChatMessages"
+  ).innerHTML = `
     <div class="emptyState" style="height:100%">
-      <div><strong>Returned to AI</strong>The assistant is now active again.</div>
+      <div>
+        <strong>Returned to AI</strong>
+        The assistant is now active again.
+      </div>
     </div>
   `;
+
+  loadLiveChats();
+  loadDashboardData();
 }
 
-setInterval(() => {
+setInterval(async ()=>{
+
   if(!user) return;
 
-  loadDashboardData();
+  await loadDashboardData();
 
-  const livechat = document.getElementById("livechat");
+  const livechat =
+    document.getElementById("livechat");
 
-  if(livechat && !livechat.classList.contains("hidden")){
-    loadLiveChats();
+  if(
+    livechat &&
+    !livechat.classList.contains("hidden")
+  ){
+
+    await loadLiveChats();
 
     if(currentLiveConversation){
-      openLiveConversation(currentLiveConversation);
+      await openLiveConversation(
+        currentLiveConversation
+      );
     }
   }
-}, 3000);
+
+}, 2500);
 </script>
 
 </body>
