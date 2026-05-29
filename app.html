@@ -1567,10 +1567,16 @@ async function handleRegister(e) {
   const r = await api('POST', '/register', { email, password });
   btn.disabled = false;
   btn.textContent = 'Create account';
-  if (r.ok && r.data) {
-    const user = r.data.user || r.data;
-    localStorage.setItem('user', JSON.stringify(user));
-    initApp(user);
+if (r.ok && r.data) {
+  const user = r.data.user || r.data;
+  localStorage.setItem('user', JSON.stringify(user));
+
+  initApp(user);
+
+  setTimeout(() => {
+    navigate('billing');
+  }, 300);
+}
   } else {
     showAuthError(r.data?.message || r.data?.error || 'Registration failed. Please try again.');
   }
