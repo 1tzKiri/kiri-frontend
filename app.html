@@ -1576,7 +1576,7 @@ if (r.ok && r.data) {
   setTimeout(() => {
     navigate('billing');
   }, 300);
-}
+
   } else {
     showAuthError(r.data?.message || r.data?.error || 'Registration failed. Please try again.');
   }
