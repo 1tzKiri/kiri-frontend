@@ -1485,6 +1485,18 @@ let selectedConvId = null;
 let selectedTakeoverId = null;
 let pollInterval = null;
 let takeovers = [];
+let pendingCheckoutPlan = getPlanFromUrl();
+let checkoutInProgress = false;
+
+function getPlanFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const plan = (params.get('plan') || '').toLowerCase();
+    return ['starter', 'pro'].includes(plan) ? plan : null;
+  } catch(e) {
+    return null;
+  }
+}
 
 // ── Helpers ──────────────────────────────
 function showToast(msg, dur = 2800) {
@@ -1601,6 +1613,16 @@ function initApp(user) {
   navigate('overview');
   loadTakeovers();
   startPolling();
+
+  // If user came from landing page pricing button: /app.html?plan=starter or /app.html?plan=pro
+  if (pendingCheckoutPlan) {
+    const planToBuy = pendingCheckoutPlan;
+    pendingCheckoutPlan = null;
+    navigate('billing');
+    showToast(`Opening ${planToBuy === 'pro' ? 'Pro' : 'Starter'} checkout…`);
+    window.history.replaceState({}, document.title, window.location.pathname);
+    setTimeout(() => createCheckout(planToBuy), 700);
+  }
 }
 
 // ── Navigation ────────────────────────────
@@ -2046,32 +2068,68 @@ function updatePlanUI(plan, usage) {
   }
 }
 
-async function createCheckout(plan) {
+async function createCheckout(plan = 'pro') {
+  if (checkoutInProgress) return;
+
+  const selectedPlan = String(plan || 'pro').toLowerCase();
+
+  if (!['starter', 'pro'].includes(selectedPlan)) {
+    showToast('❌ Invalid plan selected.');
+    return;
+  }
+
+  if (!currentUser || !currentUser.site_key) {
+    pendingCheckoutPlan = selectedPlan;
+    navigate('billing');
+    showToast('Please sign in first, then checkout will continue.');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('auth-screen').style.display = 'flex';
+    switchAuthTab('login');
+    return;
+  }
+
+  if (currentUser.role === 'admin') {
+    showToast('⚠️ Admin account cannot buy a plan. Log out and use a client account to test checkout.');
+    return;
+  }
+
   const btn = window.event?.target;
+  const originalText = btn ? btn.textContent : '';
 
-  if (btn) {
-    btn.disabled = true;
-    btn.textContent = 'Redirecting…';
-  }
+  try {
+    checkoutInProgress = true;
 
-  const r = await api('POST', '/create-checkout', {
-    plan,
-    site_key: currentUser.site_key,
-    email: currentUser.email
-  });
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Redirecting…';
+    }
 
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = plan === 'pro' ? 'Upgrade to Pro' : 'Get Starter';
-  }
+    const r = await api('POST', '/create-checkout', {
+      site_key: currentUser.site_key,
+      plan: selectedPlan
+    });
 
-  if (r.ok && (r.data?.url || r.data?.checkout_url)) {
-    window.location.href = r.data.url || r.data.checkout_url;
-  } else {
-    showToast('❌ Checkout failed. Please try again.');
+    const checkoutUrl = r.data?.url || r.data?.checkout_url;
+
+    if (r.ok && checkoutUrl) {
+      window.location.href = checkoutUrl;
+      return;
+    }
+
+    console.error('Checkout failed response:', r);
+    showToast(`❌ ${r.data?.error || 'Checkout failed. Please try again.'}`);
+
+  } catch (err) {
+    console.error('Checkout error:', err);
+    showToast('❌ Checkout failed. Check backend/Railway logs.');
+  } finally {
+    checkoutInProgress = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalText || (selectedPlan === 'pro' ? 'Upgrade to Pro' : 'Get Starter');
+    }
   }
 }
-
 // ── Admin ─────────────────────────────────
 async function loadAdmin() {
   if (currentUser?.role !== 'admin') return;
