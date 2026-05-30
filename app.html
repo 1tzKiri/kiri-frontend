@@ -1278,64 +1278,75 @@ mb-8 { margin-bottom: 8px; }
 
     <!-- ── Install Widget ── -->
     <div class="page" id="page-install">
-      <div class="page-header">
-        <div>
-          <div class="page-title">Install Widget</div>
-          <div class="page-subtitle">Embed your Kiri AI chat widget on any website in minutes.</div>
-        </div>
-      </div>
-      <div style="max-width:700px;">
-        <div class="card mb-24" style="margin-bottom:20px;">
-          <div class="section-title" style="margin-bottom:12px;">🔑 Your Site Key</div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <code style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'Courier New',monospace;font-size:13px;color:var(--accent);" id="install-sitekey">Loading...</code>
-            <button class="btn btn-ghost btn-sm" onclick="copySiteKey()">📋 Copy</button>
-          </div>
-        </div>
+  <div class="page-header">
+    <div>
+      <div class="page-title">Install Widget</div>
+      <div class="page-subtitle">Embed your Kiri AI chat widget on any website in minutes.</div>
+    </div>
+  </div>
 
-        <div class="card mb-24" style="margin-bottom:20px;">
-          <div class="section-title" style="margin-bottom:12px;">📋 Embed Code</div>
-          <p class="text-muted" style="margin-bottom:12px;font-size:12.5px;">Paste this snippet just before the closing <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">&lt;/body&gt;</code> tag on every page.</p>
-          <div class="code-block" id="install-code-block" style="position:relative;">
-            <button class="copy-btn" onclick="copyEmbedCode()">Copy</button>
-            <span id="install-code-text">Loading...</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="section-title" style="margin-bottom:18px;">🚀 Installation Steps</div>
-          <div class="install-step">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <div class="step-title">Copy the embed code above</div>
-              <div class="step-desc">Click the "Copy" button to copy the full embed snippet.</div>
-            </div>
-          </div>
-          <div class="install-step">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <div class="step-title">Open your website HTML</div>
-              <div class="step-desc">Find your main HTML file or template that loads on every page (e.g. index.html, layout.html).</div>
-            </div>
-          </div>
-          <div class="install-step">
-            <div class="step-num">3</div>
-            <div class="step-content">
-              <div class="step-title">Paste before &lt;/body&gt;</div>
-              <div class="step-desc">Locate the closing body tag and paste the embed code immediately before it.</div>
-            </div>
-          </div>
-          <div class="install-step" style="margin-bottom:0;">
-            <div class="step-num">4</div>
-            <div class="step-content">
-              <div class="step-title">Publish and test</div>
-              <div class="step-desc">Save & deploy your site. Visit your website — you should see the Kiri AI widget in the corner!</div>
-            </div>
-          </div>
-        </div>
+  <div style="max-width:700px;">
+    <div class="card mb-24" style="margin-bottom:20px;">
+      <div class="section-title" style="margin-bottom:12px;">🔑 Your Site Key</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <code style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:'Courier New',monospace;font-size:13px;color:var(--accent);" id="install-sitekey">Loading...</code>
+        <button class="btn btn-ghost btn-sm" onclick="copySiteKey()">📋 Copy</button>
       </div>
     </div>
 
+    <div class="card mb-24" style="margin-bottom:20px;">
+      <div class="section-title" style="margin-bottom:12px;">🌐 Allowed Domain</div>
+      <p class="text-muted" style="margin-bottom:12px;font-size:12.5px;">
+        Enter the website domain where this widget is allowed to run.
+      </p>
+      <input class="input" id="allowed-domain-input" placeholder="example.com">
+      <button class="btn btn-accent mt-16" onclick="saveAllowedDomain()">Save Domain</button>
+    </div>
+
+    <div class="card mb-24" style="margin-bottom:20px;">
+      <div class="section-title" style="margin-bottom:12px;">📋 Embed Code</div>
+      <p class="text-muted" style="margin-bottom:12px;font-size:12.5px;">
+        Paste this snippet just before the closing <code style="background:var(--surface2);padding:1px 5px;border-radius:3px;">&lt;/body&gt;</code> tag on every page.
+      </p>
+      <div class="code-block" id="install-code-block" style="position:relative;">
+        <button class="copy-btn" onclick="copyEmbedCode()">Copy</button>
+        <span id="install-code-text">Loading...</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin-bottom:18px;">🚀 Installation Steps</div>
+      <div class="install-step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <div class="step-title">Set your allowed domain</div>
+          <div class="step-desc">Add the website domain where your widget is allowed to run.</div>
+        </div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <div class="step-title">Copy the embed code above</div>
+          <div class="step-desc">Click the "Copy" button to copy the full embed snippet.</div>
+        </div>
+      </div>
+      <div class="install-step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Paste before &lt;/body&gt;</div>
+          <div class="step-desc">Paste the embed code immediately before the closing body tag.</div>
+        </div>
+      </div>
+      <div class="install-step" style="margin-bottom:0;">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Publish and test</div>
+          <div class="step-desc">Save & deploy your site. Your widget will only work on the allowed domain.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
     <!-- ── Billing ── -->
     <div class="page" id="page-billing">
       <div class="page-header">
