@@ -2176,7 +2176,21 @@ function copyEmbedCode() {
   const code = document.getElementById('install-code-text').textContent;
   navigator.clipboard.writeText(code).then(() => showToast('✅ Embed code copied!'));
 }
+async function saveAllowedDomain() {
+  const input = document.getElementById('allowed-domain-input');
+  const domain = input.value.trim();
 
+  const r = await api('POST', '/allowed-domain', {
+    site_key: currentUser.site_key,
+    allowed_domain: domain
+  });
+
+  if (r.ok) {
+    showToast('✅ Domain saved');
+  } else {
+    showToast('❌ Failed to save domain');
+  }
+}
 // ── Utils ─────────────────────────────────
 function formatDate(val) {
   if (!val) return '—';
