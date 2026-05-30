@@ -2009,8 +2009,24 @@ async function saveWidgetSettings() {
 }
 
 // ── Knowledge Base ─────────────────────────
-function saveKnowledge() {
-  showToast('💾 Knowledge saved (endpoint pending).');
+async function saveKnowledge() {
+  const content = document.getElementById('kb-manual').value.trim();
+
+  if (!content) {
+    showToast('Enter some knowledge first.');
+    return;
+  }
+
+  const r = await api('POST', '/knowledge', {
+    site_key: currentUser.site_key,
+    content
+  });
+
+  if (r.ok) {
+    showToast('✅ Knowledge saved');
+  } else {
+    showToast('❌ Failed to save knowledge');
+  }
 }
 function crawlUrl() {
   const url = document.getElementById('kb-url').value;
